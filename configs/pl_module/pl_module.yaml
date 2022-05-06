@@ -1,0 +1,24 @@
+_target_: src.pl_module.MultiModalPlModule
+
+model:
+  _target_: src.model.MultiModalTransformer
+  d_model: 1024
+  n_heads: 8
+  n_layers: 4
+  d_audio: 1024
+  d_text: 1024 
+  n_classes: 7
+  attn_dropout: .3
+  relu_dropout: .3
+  res_dropout: .3
+  emb_dropout: .3
+  out_dropout: .3
+  attn_mask: True 
+  scale_embedding: True
+
+num_classes: 7
+average: 'macro'
+lr: 0.00001
+t_max: 50
+eta_min: 0.0000025
+interval: 'step'

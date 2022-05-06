@@ -1,0 +1,7 @@
+wandb:
+  _target_: pytorch_lightning.loggers.wandb.WandbLogger
+  project: 'MultiModalTransformer'
+  save_dir: "/gdrive/ETRI/pl"
+  name: ${model_name}
+  offline: False # set True to store all logs only locally
+  tags: ${tags}
