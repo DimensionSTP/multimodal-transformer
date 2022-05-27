@@ -4,7 +4,7 @@
 
 ### 실험 세팅
 
-* 코드 수정 필요시 **colab-ssh** 연결로 수정함[(참고)](:https://blog.naver.com/PostView.nhn?blogId=ys10mjh&logNo=222328257839&parentCategoryNo=&categoryNo=29&viewDate=&isShowPopularPosts=true&from=search)
+* 코드 수정 필요시 **colab-ssh** 연결로 수정함[(참고)](https://blog.naver.com/PostView.nhn?blogId=ys10mjh&logNo=222328257839&parentCategoryNo=&categoryNo=29&viewDate=&isShowPopularPosts=true&from=search)
 
 * git clone이 아닌 zip file download로 **구글 드라이브**에 저장
 
