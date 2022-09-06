@@ -9,3 +9,5 @@ multirun
 *.pth
 *.bin
 *.txt
+KEMDy19/
+checkpoint/
