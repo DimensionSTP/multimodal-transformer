@@ -1,9 +1,9 @@
 model_checkpoint:
   _target_: pytorch_lightning.callbacks.ModelCheckpoint
-  monitor: "val_F1Score" 
-  mode: "max" 
-  save_top_k: 1 
-  save_last: True 
+  monitor: "val_F1Score"
+  mode: "max"
+  save_top_k: 1
+  save_last: True
   verbose: True
   dirpath: "/gdrive/ETRI/pl"
   filename: "epoch_{epoch:02d}"
@@ -11,10 +11,10 @@ model_checkpoint:
 
 early_stopping:
   _target_: pytorch_lightning.callbacks.EarlyStopping
-  monitor: "val_F1Score" 
-  mode: "max" 
+  monitor: "val_F1Score"
+  mode: "max"
   patience: 3
-  min_delta: 0 
+  min_delta: 0
 
 model_summary:
   _target_: pytorch_lightning.callbacks.RichModelSummary

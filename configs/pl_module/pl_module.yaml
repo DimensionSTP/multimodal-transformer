@@ -6,14 +6,14 @@ model:
   n_heads: 8
   n_layers: 4
   d_audio: 1024
-  d_text: 1024 
+  d_text: 1024
   n_classes: 7
   attn_dropout: .3
   relu_dropout: .3
   res_dropout: .3
   emb_dropout: .3
   out_dropout: .3
-  attn_mask: True 
+  attn_mask: True
   scale_embedding: True
 
 num_classes: 7

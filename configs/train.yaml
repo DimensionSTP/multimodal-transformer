@@ -7,7 +7,7 @@ defaults:
   - callbacks: default.yaml
   - trainer: default.yaml
 
-data_path: 
+data_path:
   train: '/content/path_data/path_train2.pkl'
   val: '/content/path_data/path_val2.pkl'
   test: '/content/path_data/path_test2.pkl'
