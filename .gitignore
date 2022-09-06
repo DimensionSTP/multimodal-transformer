@@ -2,3 +2,10 @@ data/
 .env
 logs
 multirun
+*.csv
+*.ipynb
+*.json
+*.pt
+*.pth
+*.bin
+*.txt
