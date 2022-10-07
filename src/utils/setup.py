@@ -5,7 +5,7 @@ from hydra.utils import instantiate
 
 from torch.utils.data import Dataset, DataLoader
 
-import pytorch_lightning as pl
+from pytorch_lightning import LightningModule
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 from pytorch_lightning.loggers import WandbLogger
 
@@ -19,29 +19,42 @@ class SetUp:
 
     def get_train_loader(self) -> DataLoader:
         train_dataset: Dataset = instantiate(
-            self.config.dataset, data_path=self.train_path
+            self.config.dataset_module, data_path=self.train_path
         )
         return DataLoader(
-            dataset=train_dataset, batch_size=self.config.batch_size, shuffle=True
+            dataset=train_dataset,
+            batch_size=self.config.batch_size,
+            shuffle=True,
+            pin_memory=True,
         )
 
     def get_val_loader(self) -> DataLoader:
-        val_dataset: Dataset = instantiate(self.config.dataset, data_path=self.val_path)
+        val_dataset: Dataset = instantiate(
+            self.config.dataset_module, data_path=self.val_path
+        )
         return DataLoader(
-            dataset=val_dataset, batch_size=self.config.batch_size, shuffle=False
+            dataset=val_dataset,
+            batch_size=self.config.batch_size,
+            shuffle=False,
+            pin_memory=True,
         )
 
     def get_test_loader(self) -> DataLoader:
         test_dataset: Dataset = instantiate(
-            self.config.dataset, data_path=self.test_path
+            self.config.dataset_module, data_path=self.test_path
         )
         return DataLoader(
-            dataset=test_dataset, batch_size=self.config.batch_size, shuffle=False
+            dataset=test_dataset,
+            batch_size=self.config.batch_size,
+            shuffle=False,
+            pin_memory=True,
         )
 
-    def get_pl_module(self) -> pl.LightningModule:
-        pl_module: pl.LightningModule = instantiate(self.config.pl_module)
-        return pl_module
+    def get_architecture_module(self) -> LightningModule:
+        architecture_module: LightningModule = instantiate(
+            self.config.architecture_module
+        )
+        return architecture_module
 
     def get_callbacks(self) -> List:
         model_checkpotint: ModelCheckpoint = instantiate(

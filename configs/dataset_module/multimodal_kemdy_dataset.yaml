@@ -1,0 +1,24 @@
+_target_: src.dataset_modules.datasets.multimodal_dataset.KEMDy19Dataset
+data_path: C:/project_Han/multimodal-transformer/path_data/path_train.pkl
+pretrained_hubert: C:/project_Han/multimodal-transformer/checkpoints/hubert_large/checkpoint-4110
+pretrained_roberta: C:/project_Han/multimodal-transformer/checkpoints/roberta_large/checkpoint-4110
+audio_max_length: 80000
+text_max_length: 249
+num_labels: 7
+audio_conv_kernel:
+  - 10
+  - 3
+  - 3
+  - 3
+  - 3
+  - 2
+  - 2
+audio_conv_stride:
+  - 5
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+device: 'cuda:0'

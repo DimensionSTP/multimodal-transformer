@@ -15,7 +15,7 @@ from transformers import (
 )
 
 
-class MultiModalDataset(Dataset):
+class KEMDy19Dataset(Dataset):
     def __init__(
         self,
         data_path: str,
@@ -28,7 +28,7 @@ class MultiModalDataset(Dataset):
         audio_conv_stride: List[int],
         device: str,
     ):
-        super(MultiModalDataset, self).__init__()
+        super(KEMDy19Dataset, self).__init__()
         self.data_path = data_path
         self.audio_feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained(
             pretrained_hubert
@@ -165,7 +165,12 @@ class MultiModalDataset(Dataset):
     def load_data(data_path: str):
         data = pd.read_pickle(data_path)
         data = data.dropna()
-        audio_path = list(data["total_path"])
+        # audio_path = list(data["total_path"])
+        audio_path_raw = list(data["total_path"])
+        audio_path = [
+            "C:/project_Han/multimodal-transformer" + audio_file[1:]
+            for audio_file in audio_path_raw
+        ]
         text = list(data["text"])
         labels = list(data["emotion"])
         return audio_path, text, labels

@@ -1,18 +1,18 @@
 model_checkpoint:
   _target_: pytorch_lightning.callbacks.ModelCheckpoint
-  monitor: "val_F1Score"
-  mode: "max"
-  save_top_k: 1
+  monitor: val_F1Score
+  mode: max
+  save_top_k: 3
   save_last: True
   verbose: True
-  dirpath: "/gdrive/ETRI/pl"
-  filename: "epoch_{epoch:02d}"
+  dirpath: C:/project_Han/multimodal-transformer/checkpoints
+  filename: ${model_name}-bs${batch_size}-epoch{epoch}
   auto_insert_metric_name: False
 
 early_stopping:
   _target_: pytorch_lightning.callbacks.EarlyStopping
-  monitor: "val_F1Score"
-  mode: "max"
+  monitor: val_F1Score
+  mode: max
   patience: 3
   min_delta: 0
 

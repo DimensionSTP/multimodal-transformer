@@ -1,7 +1,7 @@
 wandb:
   _target_: pytorch_lightning.loggers.wandb.WandbLogger
-  project: 'MultiModalTransformer'
-  save_dir: "/gdrive/ETRI/pl"
-  name: ${model_name}
+  project: ${model_name}
+  save_dir: C:/project_Han/multimodal-transformer/logs
+  name: bs${batch_size}-lr${lr}
   offline: False # set True to store all logs only locally
   tags: ${tags}
