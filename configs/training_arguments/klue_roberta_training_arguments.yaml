@@ -1,0 +1,15 @@
+_target_: transformers.TrainingArguments
+output_dir: C:/project_Han/multimodal-transformer/checkpoints/klue_roberta_large/
+evaluation_strategy: epoch
+save_strategy: epoch
+learning_rate: ${lr}
+per_device_train_batch_size: ${batch_size}
+per_device_eval_batch_size: ${batch_size}
+num_train_epochs: ${epoch}
+weight_decay: 0.01
+load_best_model_at_end: True
+metric_for_best_model: accuracy
+greater_is_better: True
+report_to: wandb
+run_name: ${run_name}
+seed : ${seed}

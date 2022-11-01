@@ -1,0 +1,5 @@
+_target_: src.dataset_modules.datasets.only_text_dataset.KEMDy19OnlyTextDataset
+data_path: C:/project_Han/multimodal-transformer/path_data/path_train.pkl
+pretrained_model: ${pretrained_model_name}
+text_max_length: 249
+num_labels: ${num_labels}

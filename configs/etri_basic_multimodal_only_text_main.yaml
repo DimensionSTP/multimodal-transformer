@@ -1,0 +1,39 @@
+# @package _global_
+defaults:
+  - dataset_module: only_text_kemdy_dataset
+  - training_arguments: klue_roberta_training_arguments
+  - hydra: hydra
+
+seed: 2022
+
+data_path:
+  train: C:/project_Han/multimodal-transformer/path_data/path_train.pkl
+  val: C:/project_Han/multimodal-transformer/path_data/path_val.pkl
+  test: C:/project_Han/multimodal-transformer/path_data/path_test.pkl
+
+num_labels: 7
+
+# pretrained_model_name: C:/project_Han/multimodal-transformer/pretrained_model/klue/roberta-large
+pretrained_model_name: klue/roberta-large
+output_hidden_states: False
+use_fast: True
+
+metric:
+  first_metric: glue
+  second_metric: mnli
+
+batch_size: 32
+
+lr: 0.00002
+
+save_predictions: C:/project_Han/multimodal-transformer/preds/only_text/only_text.npy
+
+project_name: MultiModalTransformer-OnlyText
+model_name: ${project_name}-bs${batch_size}-lr${lr}-epoch${epoch}
+
+run_name: ${model_name}-all
+work_dir: ${hydra:runtime.cwd}
+
+tags: ${model_name}
+
+epoch: 5
