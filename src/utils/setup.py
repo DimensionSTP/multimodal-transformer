@@ -13,13 +13,10 @@ from pytorch_lightning.loggers import WandbLogger
 class SetUp:
     def __init__(self, config: DictConfig):
         self.config = config
-        self.train_path = config.data_path.train
-        self.val_path = config.data_path.val
-        self.test_path = config.data_path.test
 
     def get_train_loader(self) -> DataLoader:
         train_dataset: Dataset = instantiate(
-            self.config.dataset_module, data_path=self.train_path
+            self.config.dataset_module, data_path=self.config.data_path.train
         )
         return DataLoader(
             dataset=train_dataset,
@@ -30,7 +27,7 @@ class SetUp:
 
     def get_val_loader(self) -> DataLoader:
         val_dataset: Dataset = instantiate(
-            self.config.dataset_module, data_path=self.val_path
+            self.config.dataset_module, data_path=self.config.data_path.val
         )
         return DataLoader(
             dataset=val_dataset,
@@ -41,7 +38,7 @@ class SetUp:
 
     def get_test_loader(self) -> DataLoader:
         test_dataset: Dataset = instantiate(
-            self.config.dataset_module, data_path=self.test_path
+            self.config.dataset_module, data_path=self.config.data_path.test
         )
         return DataLoader(
             dataset=test_dataset,
