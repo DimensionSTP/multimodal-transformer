@@ -1,5 +1,5 @@
 _target_: transformers.TrainingArguments
-output_dir: C:/project_Han/multimodal-transformer/checkpoints/klue_roberta_large/
+output_dir: ${output_directory}
 evaluation_strategy: epoch
 save_strategy: epoch
 learning_rate: ${lr}

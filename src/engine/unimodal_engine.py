@@ -5,11 +5,11 @@ import pandas as pd
 
 from transformers import Trainer
 
-from ..utils.only_text_setup import SetUp
+from ..utils.unimodal_setup import SetUp
 
 
-def engine(config: DictConfig):
-    setup = SetUp(config)
+def engine(config: DictConfig, modality: str):
+    setup = SetUp(config, modality)
 
     train_dataset = setup.get_train_dataset()
     val_dataset = setup.get_val_dataset()

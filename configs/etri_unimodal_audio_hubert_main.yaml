@@ -1,0 +1,37 @@
+# @package _global_
+defaults:
+  - dataset_module: unimodal_audio_kemdy_dataset
+  - training_arguments: unimodal_training_arguments
+  - hydra: hydra
+
+seed: 2022
+
+data_path:
+  train: C:/project_Han/multimodal-transformer/path_data/path_train.pkl
+  val: C:/project_Han/multimodal-transformer/path_data/path_val.pkl
+  test: C:/project_Han/multimodal-transformer/path_data/path_test.pkl
+
+pretrained_model_name: facebook/hubert-large-ls960-ft
+num_labels: 7
+output_hidden_states: False
+
+metric:
+  first_metric: glue
+  second_metric: mnli
+
+batch_size: 8
+
+lr: 0.00002
+
+output_directory: C:/project_Han/multimodal-transformer/checkpoints/facebook_hubert_large/
+save_predictions: C:/project_Han/multimodal-transformer/preds/unimodal_audio/unimodal_audio.npy
+
+project_name: MultiModalTransformer-UnimodalAudio
+model_name: ${project_name}-bs${batch_size}-lr${lr}-epoch${epoch}
+
+run_name: ${model_name}-all
+work_dir: ${hydra:runtime.cwd}
+
+tags: ${model_name}
+
+epoch: 5

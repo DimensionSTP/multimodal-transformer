@@ -5,27 +5,16 @@ import pandas as pd
 import torch
 from torch.utils.data import Dataset
 
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import AutoTokenizer
 
 
-class KEMDy19OnlyTextDataset(Dataset):
-    def __init__(
-        self,
-        data_path: str,
-        pretrained_model: str,
-        text_max_length: int,
-        num_labels: int,
-    ):
-        super(KEMDy19OnlyTextDataset, self).__init__()
+class KEMDy19Dataset(Dataset):
+    def __init__(self, data_path: str, pretrained_model: str, text_max_length: int):
+        super(KEMDy19Dataset, self).__init__()
         self.data_path = data_path
-        self.text_tokenizer = AutoTokenizer.from_pretrained(
-            pretrained_model, use_fast=True
-        )
-        self.text_model = AutoModelForSequenceClassification.from_pretrained(
-            pretrained_model, num_labels=num_labels, output_hidden_states=False
-        )
+        self.text_tokenizer = AutoTokenizer.from_pretrained(pretrained_model)
         self.text_max_length = text_max_length
-        self.text, self.labels = self.load_data(self.data_path)
+        self.text, self.labels = self.load_data()
 
     def __len__(self):
         return len(self.labels)
@@ -53,9 +42,8 @@ class KEMDy19OnlyTextDataset(Dataset):
         text = re.sub(r"[^a-zA-Z가-힣ㄱ-ㅎ0-9.!?]+", r" ", str(text))
         return text
 
-    @staticmethod
-    def load_data(data_path: str):
-        data = pd.read_pickle(data_path)
+    def load_data(self):
+        data = pd.read_pickle(self.data_path)
         data = data.dropna()
         text = list(data["text"])
         labels = list(data["emotion"])
