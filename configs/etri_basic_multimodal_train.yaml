@@ -14,7 +14,7 @@ data_path:
   val: C:/project_Han/multimodal-transformer/path_data/path_val.pkl
   test: C:/project_Han/multimodal-transformer/path_data/path_test.pkl
 
-batch_size: 16
+batch_size: 48
 
 d_model: 1024
 n_heads: 8
