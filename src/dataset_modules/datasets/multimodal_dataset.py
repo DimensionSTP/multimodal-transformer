@@ -8,10 +8,10 @@ import librosa
 import torch
 from torch.utils.data import Dataset
 from transformers import (
-    AutoTokenizer,
     Wav2Vec2FeatureExtractor,
-    AutoModelForSequenceClassification,
+    AutoTokenizer,
     HubertForSequenceClassification,
+    AutoModelForSequenceClassification,
 )
 
 
@@ -47,14 +47,14 @@ class KEMDy19Dataset(Dataset):
         self.audio_conv_kernel = audio_conv_kernel
         self.audio_conv_stride = audio_conv_stride
         self.device = device
-        self.audio_path, self.text, self.labels = self.load_data(self.data_path)
+        self.audio_path, self.text, self.labels = self.load_data()
 
     def __len__(self):
         return len(self.labels)
 
     def __getitem__(self, idx):
         audio = librosa.load(self.audio_path[idx], sr=16000)[0]
-        audio_input = self.tokenize_audio(audio)
+        audio_input = self.feature_extract_audio(audio)
         audio_data = {k: torch.tensor(v) for k, v in audio_input.items()}
         audio_data["labels"] = torch.tensor(self.labels[idx])
         audio_hidden = self.get_audio_hidden(audio_data)
@@ -106,7 +106,7 @@ class KEMDy19Dataset(Dataset):
             torch.cuda.empty_cache()
         return hidden.squeeze()
 
-    def tokenize_audio(self, audio) -> torch.Tensor:
+    def feature_extract_audio(self, audio) -> torch.Tensor:
         feature_extractor = self.audio_feature_extractor
         tokenized_audio = feature_extractor(
             audio,
@@ -161,16 +161,15 @@ class KEMDy19Dataset(Dataset):
         text = re.sub(r"[^a-zA-Z가-힣ㄱ-ㅎ0-9.!?]+", r" ", str(text))
         return text
 
-    @staticmethod
-    def load_data(data_path: str):
-        data = pd.read_pickle(data_path)
+    def load_data(self):
+        data = pd.read_pickle(self.data_path)
         data = data.dropna()
-        # audio_path = list(data["total_path"])
-        audio_path_raw = list(data["total_path"])
-        audio_path = [
-            "C:/project_Han/multimodal-transformer" + audio_file[1:]
-            for audio_file in audio_path_raw
-        ]
+        split_current_path = self.data_path.split("/")[:3]
+        current_path = (
+            f"{split_current_path[0]}/{split_current_path[1]}/{split_current_path[2]}"
+        )
+        audio_path = data["total_path"].values
+        audio_path = [f"{current_path}/{path[2:]}" for path in audio_path]
         text = list(data["text"])
         labels = list(data["emotion"])
         return audio_path, text, labels
