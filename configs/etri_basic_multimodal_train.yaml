@@ -7,6 +7,8 @@ defaults:
   - callbacks: callbacks
   - trainer: trainer
 
+project_dir: C:/project_Han/multimodal-transformer
+
 seed: 2022
 
 data_path:

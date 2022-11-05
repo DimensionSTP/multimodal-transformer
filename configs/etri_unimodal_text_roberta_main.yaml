@@ -4,6 +4,8 @@ defaults:
   - training_arguments: unimodal_training_arguments
   - hydra: hydra
 
+project_dir: C:/project_Han/multimodal-transformer
+
 seed: 2022
 
 data_path:
