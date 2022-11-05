@@ -12,9 +12,9 @@ project_dir: C:/project_Han/multimodal-transformer
 seed: 2022
 
 data_path:
-  train: C:/project_Han/multimodal-transformer/path_data/path_train.pkl
-  val: C:/project_Han/multimodal-transformer/path_data/path_val.pkl
-  test: C:/project_Han/multimodal-transformer/path_data/path_test.pkl
+  train: ${project_dir}/path_data/path_train.pkl
+  val: ${project_dir}/path_data/path_val.pkl
+  test: ${project_dir}/path_data/path_test.pkl
 
 batch_size: 48
 

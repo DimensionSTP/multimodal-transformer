@@ -9,9 +9,9 @@ project_dir: C:/project_Han/multimodal-transformer
 seed: 2022
 
 data_path:
-  train: C:/project_Han/multimodal-transformer/path_data/path_train.pkl
-  val: C:/project_Han/multimodal-transformer/path_data/path_val.pkl
-  test: C:/project_Han/multimodal-transformer/path_data/path_test.pkl
+  train: ${project_dir}/path_data/path_train.pkl
+  val: ${project_dir}/path_data/path_val.pkl
+  test: ${project_dir}/path_data/path_test.pkl
 
 pretrained_model_name: klue/roberta-large
 num_labels: 7
@@ -25,8 +25,8 @@ batch_size: 8
 
 lr: 0.00002
 
-output_directory: C:/project_Han/multimodal-transformer/checkpoints/klue_roberta_large/
-save_predictions: C:/project_Han/multimodal-transformer/preds/unimodal_text/unimodal_text.npy
+output_directory: ${project_dir}/checkpoints/klue_roberta_large/
+save_predictions: ${project_dir}/preds/unimodal_text/unimodal_text.npy
 
 project_name: MultiModalTransformer-UnimodalText
 model_name: ${project_name}-bs${batch_size}-lr${lr}-epoch${epoch}
