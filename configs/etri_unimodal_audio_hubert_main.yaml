@@ -4,9 +4,9 @@ defaults:
   - training_arguments: unimodal_training_arguments
   - hydra: hydra
 
-project_dir: C:/project_Han/multimodal-transformer
+project_dir: /home/ddang/multimodal-transformer
 
-seed: 2022
+seed: 2023
 
 data_path:
   train: ${project_dir}/path_data/path_train.pkl

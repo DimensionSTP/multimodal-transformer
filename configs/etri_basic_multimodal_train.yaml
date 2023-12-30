@@ -7,16 +7,16 @@ defaults:
   - callbacks: callbacks
   - trainer: trainer
 
-project_dir: C:/project_Han/multimodal-transformer
+project_dir: /home/ddang/multimodal-transformer
 
-seed: 2022
+seed: 2023
 
 data_path:
   train: ${project_dir}/path_data/path_train.pkl
   val: ${project_dir}/path_data/path_val.pkl
   test: ${project_dir}/path_data/path_test.pkl
 
-batch_size: 48
+batch_size: 32
 
 d_model: 1024
 n_heads: 8
