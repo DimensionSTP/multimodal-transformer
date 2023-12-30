@@ -26,8 +26,8 @@ class MultiModalPlModule(pl.LightningModule):
 
         metrics = MetricCollection(
             [
-                F1Score(num_classes=num_classes, average=average),
-                Accuracy(num_classes=num_classes, average=average),
+                F1Score(task="multiclass", num_classes=num_classes, average=average),
+                Accuracy(task="multiclass", num_classes=num_classes, average=average),
             ]
         )
         self.train_metrics = metrics.clone(prefix="train_")
@@ -67,41 +67,57 @@ class MultiModalPlModule(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         loss, pred, label = self.step(batch)
+        metrics = self.train_metrics(pred, label)
+        self.log(
+            "train_loss",
+            loss,
+            on_step=False,
+            on_epoch=True,
+            prog_bar=False,
+            sync_dist=True,
+        )
+        self.log_dict(
+            metrics, on_step=False, on_epoch=True, prog_bar=True, sync_dist=True
+        )
         return {"loss": loss, "pred": pred, "label": label}
 
     def validation_step(self, batch, batch_idx):
         loss, pred, label = self.step(batch)
+        metrics = self.val_metrics(pred, label)
+        self.log(
+            "val_loss",
+            loss,
+            on_step=False,
+            on_epoch=True,
+            prog_bar=False,
+            sync_dist=True,
+        )
+        self.log_dict(
+            metrics, on_step=False, on_epoch=True, prog_bar=True, sync_dist=True
+        )
         return {"loss": loss, "pred": pred, "label": label}
 
     def test_step(self, batch, batch_idx):
         loss, pred, label = self.step(batch)
+        metrics = self.test_metrics(pred, label)
+        self.log(
+            "test_loss",
+            loss,
+            on_step=False,
+            on_epoch=True,
+            prog_bar=False,
+            sync_dist=True,
+        )
+        self.log_dict(
+            metrics, on_step=False, on_epoch=True, prog_bar=True, sync_dist=True
+        )
         return {"loss": loss, "pred": pred, "label": label}
 
-    def training_step_end(self, outputs):
-        metrics = self.train_metrics(outputs["pred"], outputs["label"])
-        self.log(
-            "train_loss", outputs["loss"], on_step=False, on_epoch=True, prog_bar=False
-        )
-        self.log_dict(metrics, on_step=False, on_epoch=True, prog_bar=True)
-        return sum(outputs["loss"]) / len(outputs["loss"])
-
-    def validation_step_end(self, outputs):
-        metrics = self.val_metrics(outputs["pred"], outputs["label"])
-        self.log(
-            "val_loss", outputs["loss"], on_step=False, on_epoch=True, prog_bar=False
-        )
-        self.log_dict(metrics, on_step=False, on_epoch=True, prog_bar=True)
-        return sum(outputs["loss"]) / len(outputs["loss"])
-
-    def test_step_end(self, outputs):
-        metrics = self.test_metrics(outputs["pred"], outputs["label"])
-        self.log(
-            "test_loss", outputs["loss"], on_step=False, on_epoch=True, prog_bar=False
-        )
-        self.log_dict(metrics, on_step=False, on_epoch=True, prog_bar=True)
-        return sum(outputs["loss"]) / len(outputs["loss"])
-
-    def on_epoch_end(self):
+    def train_epoch_end(self, train_step_outputs):
         self.train_metrics.reset()
+
+    def validation_epoch_end(self, validation_step_outputs):
         self.val_metrics.reset()
+
+    def test_epoch_end(self, test_step_outputs):
         self.test_metrics.reset()
