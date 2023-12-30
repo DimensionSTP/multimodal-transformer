@@ -13,3 +13,4 @@ logs/runs/
 logs/wandb/
 KEMDy19/
 multirun/
+outputs/
