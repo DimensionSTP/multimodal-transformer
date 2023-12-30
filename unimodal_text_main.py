@@ -4,12 +4,12 @@ os.environ["CURL_CA_BUNDLE"] = ""
 
 import hydra
 
-from src.engine.unimodal_engine import engine
+from src.pipeline.unimodal_pipeline import pipeline
 
 
 @hydra.main(config_path="configs/", config_name="etri_unimodal_text_roberta_main.yaml")
 def main(config):
-    return engine(config, modality="text")
+    return pipeline(config, modality="text")
 
 
 if __name__ == "__main__":
