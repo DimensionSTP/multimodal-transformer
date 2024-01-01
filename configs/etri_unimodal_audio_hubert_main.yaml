@@ -6,7 +6,7 @@ defaults:
 
 project_dir: /home/ddang/multimodal-transformer
 
-seed: 2023
+seed: 2024
 
 data_path:
   train: ${project_dir}/path_data/path_train.pkl
@@ -21,7 +21,7 @@ metric:
   first_metric: glue
   second_metric: mnli
 
-batch_size: 8
+batch_size: 32
 
 lr: 0.00002
 
