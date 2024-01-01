@@ -6,7 +6,7 @@
 *.json
 *.pt
 *.pth
-*.txt
+*.npy
 *__pycache__
 data/
 logs/runs/
@@ -14,3 +14,5 @@ logs/wandb/
 KEMDy19/
 multirun/
 outputs/
+checkpoints/
+preds/
