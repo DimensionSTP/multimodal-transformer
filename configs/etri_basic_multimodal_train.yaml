@@ -16,7 +16,7 @@ data_path:
   val: ${project_dir}/path_data/path_val.pkl
   test: ${project_dir}/path_data/path_test.pkl
 
-batch_size: 32
+batch_size: 64
 
 d_model: 1024
 n_heads: 8
