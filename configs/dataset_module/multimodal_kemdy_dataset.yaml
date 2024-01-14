@@ -1,4 +1,4 @@
-_target_: src.dataset_modules.datasets.multimodal_dataset.KEMDy19Dataset
+_target_: src.dataset_modules.multimodal_dataset.KEMDy19Dataset
 data_path: ${project_dir}/path_data/path_train.pkl
 pretrained_hubert: ${project_dir}/checkpoints/hubert_large/checkpoint-4110
 pretrained_roberta: ${project_dir}/checkpoints/roberta_large/checkpoint-4110
@@ -21,4 +21,4 @@ audio_conv_stride:
   - 2
   - 2
   - 2
-device: 'cuda:0'
+device: "cuda"

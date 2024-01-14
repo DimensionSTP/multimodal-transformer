@@ -1,3 +1,3 @@
-_target_: src.dataset_modules.datasets.unimodal_audio_dataset.KEMDy19Dataset
+_target_: src.dataset_modules.unimodal_audio_dataset.KEMDy19Dataset
 data_path: ${project_dir}/path_data/path_train.pkl
 pretrained_model: ${pretrained_model_name}
