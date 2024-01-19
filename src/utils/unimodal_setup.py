@@ -13,10 +13,11 @@ from transformers import (
     TrainingArguments,
 )
 from datasets import load_metric
+from datasets.metric import Metric
 
 
 class SetUp:
-    def __init__(self, config: DictConfig, modality: str):
+    def __init__(self, config: DictConfig, modality: str,) -> None:
         self.config = config
         self.modality = modality
 
@@ -70,7 +71,7 @@ class SetUp:
             raise Exception("Only text or audio can be training modality")
         return model
 
-    def get_metric(self):
+    def get_metric(self) -> Metric:
         metric = load_metric(
             self.config.metric.first_metric, self.config.metric.second_metric
         )

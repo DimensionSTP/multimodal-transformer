@@ -6,7 +6,7 @@ from pytorch_lightning import Trainer, seed_everything
 from ..utils.setup import SetUp
 
 
-def train(config: DictConfig):
+def train(config: DictConfig,) -> None:
 
     if "seed" in config:
         seed_everything(config.seed)
@@ -30,7 +30,7 @@ def train(config: DictConfig):
     )
 
 
-def test(config: DictConfig):
+def test(config: DictConfig,) -> None:
 
     if "seed" in config:
         seed_everything(config.seed)

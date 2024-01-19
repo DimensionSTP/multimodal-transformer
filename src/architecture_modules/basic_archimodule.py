@@ -1,3 +1,5 @@
+from typing import Tuple, Dict, Any
+
 import torch
 from torch import optim, nn
 from torch.nn import functional as F
@@ -16,7 +18,7 @@ class MultiModalPlModule(pl.LightningModule):
         t_max: int,
         eta_min: float,
         interval: str,
-    ):
+    ) -> None:
         super(MultiModalPlModule, self).__init__()
         self.model = model
         self.lr = lr
@@ -40,22 +42,22 @@ class MultiModalPlModule(pl.LightningModule):
         audio_mask: torch.Tensor,
         text: torch.Tensor,
         text_mask: torch.Tensor,
-    ):
+    ) -> torch.Tensor:
         output = self.model(
             audio=audio, audio_mask=audio_mask, text=text, text_mask=text_mask
         )
         return output
 
-    def step(self, batch):
+    def step(self, batch: Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor],) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         audio, audio_mask, text, text_mask, label = batch
         output = self(
             audio=audio, audio_mask=audio_mask, text=text, text_mask=text_mask
         )
         loss = F.cross_entropy(output, label)
         pred = torch.argmax(output, dim=1)
-        return loss, pred, label
+        return (loss, pred, label)
 
-    def configure_optimizers(self):
+    def configure_optimizers(self) -> Dict[str, Any]:
         adam_w_optimizer = optim.AdamW(self.parameters(), lr=self.lr)
         cosine_scheduler = optim.lr_scheduler.CosineAnnealingLR(
             adam_w_optimizer, T_max=self.t_max, eta_min=self.eta_min
@@ -65,7 +67,7 @@ class MultiModalPlModule(pl.LightningModule):
             "lr_scheduler": {"scheduler": cosine_scheduler, "interval": self.interval},
         }
 
-    def training_step(self, batch, batch_idx):
+    def training_step(self, batch: Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor], batch_idx: int,) -> Dict[str, torch.Tensor]:
         loss, pred, label = self.step(batch)
         metrics = self.train_metrics(pred, label)
         self.log(
@@ -81,7 +83,7 @@ class MultiModalPlModule(pl.LightningModule):
         )
         return {"loss": loss, "pred": pred, "label": label}
 
-    def validation_step(self, batch, batch_idx):
+    def validation_step(self, batch: Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor], batch_idx: int,) -> Dict[str, torch.Tensor]:
         loss, pred, label = self.step(batch)
         metrics = self.val_metrics(pred, label)
         self.log(
@@ -97,7 +99,7 @@ class MultiModalPlModule(pl.LightningModule):
         )
         return {"loss": loss, "pred": pred, "label": label}
 
-    def test_step(self, batch, batch_idx):
+    def test_step(self, batch: Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor], batch_idx: int,) -> Dict[str, torch.Tensor]:
         loss, pred, label = self.step(batch)
         metrics = self.test_metrics(pred, label)
         self.log(
@@ -113,11 +115,11 @@ class MultiModalPlModule(pl.LightningModule):
         )
         return {"loss": loss, "pred": pred, "label": label}
 
-    def train_epoch_end(self, train_step_outputs):
+    def train_epoch_end(self, train_step_outputs: Dict[str, torch.Tensor],) -> None:
         self.train_metrics.reset()
 
-    def validation_epoch_end(self, validation_step_outputs):
+    def validation_epoch_end(self, validation_step_outputs: Dict[str, torch.Tensor],) -> None:
         self.val_metrics.reset()
 
-    def test_epoch_end(self, test_step_outputs):
+    def test_epoch_end(self, test_step_outputs: Dict[str, torch.Tensor],) -> None:
         self.test_metrics.reset()

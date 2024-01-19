@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Any
 
 from omegaconf import DictConfig
 from hydra.utils import instantiate
@@ -11,7 +11,7 @@ from pytorch_lightning.loggers import WandbLogger
 
 
 class SetUp:
-    def __init__(self, config: DictConfig):
+    def __init__(self, config: DictConfig,) -> None:
         self.config = config
 
     def get_train_loader(self) -> DataLoader:
@@ -53,7 +53,7 @@ class SetUp:
         )
         return architecture_module
 
-    def get_callbacks(self) -> List:
+    def get_callbacks(self) -> List[Any]:
         model_checkpotint: ModelCheckpoint = instantiate(
             self.config.callbacks.model_checkpoint
         )

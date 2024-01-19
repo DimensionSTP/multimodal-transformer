@@ -1,4 +1,5 @@
 import re
+from typing import Tuple, Dict, List, Any
 
 import pandas as pd
 
@@ -16,17 +17,17 @@ class KEMDy19Dataset(Dataset):
         self.text_max_length = text_max_length
         self.text, self.labels = self.load_data()
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.labels)
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: int,) -> Dict[str, Any]:
         normalized_text = self.normalize_string(self.text[idx])
         text_input = self.tokenize_text(normalized_text)
         text_data = {k: torch.tensor(v).squeeze() for k, v in text_input.items()}
         text_data["labels"] = torch.tensor(self.labels[idx])
         return text_data
 
-    def tokenize_text(self, text):
+    def tokenize_text(self, text: str,) -> torch.Tensor:
         tokenized_text = self.text_tokenizer(
             text,
             max_length=self.text_max_length,
@@ -37,14 +38,14 @@ class KEMDy19Dataset(Dataset):
         return tokenized_text
 
     @staticmethod
-    def normalize_string(text):
+    def normalize_string(text: str,) -> str:
         text = re.sub(r"[\s]", r" ", str(text))
         text = re.sub(r"[^a-zA-Z가-힣ㄱ-ㅎ0-9.!?]+", r" ", str(text))
         return text
 
-    def load_data(self):
+    def load_data(self) -> Tuple[List[str], List[int]]:
         data = pd.read_pickle(self.data_path)
         data = data.dropna()
         text = list(data["text"])
         labels = list(data["emotion"])
-        return text, labels
+        return (text, labels)
