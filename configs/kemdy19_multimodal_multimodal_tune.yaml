@@ -1,0 +1,30 @@
+# @package _global_
+defaults:
+  - dataset_module: multimodal_kemdy_dataset
+  - tuner_module: multimodal_tunermodule
+  - hydra: hydra
+
+project_dir: /home/ddang/multimodal-transformer
+
+seed: 2024
+
+data_path:
+  train: ${project_dir}/path_data/path_train.pkl
+  val: ${project_dir}/path_data/path_val.pkl
+  test: ${project_dir}/path_data/path_test.pkl
+
+batch_size: 48
+
+num_trials: 3
+save_path: ${project_dir}/hparams
+
+dataset_name: KEMDy19
+project_name: MultiModalTransformer
+model_name: ${dataset_name}-${project_name}
+
+run_name: ${model_name}-tune
+work_dir: ${hydra:runtime.cwd}
+
+tags: ${model_name}
+
+epoch: 10

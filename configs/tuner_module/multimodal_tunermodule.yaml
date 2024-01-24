@@ -1,0 +1,64 @@
+_target_: src.tuner_modules.multimodal_tunermodule.MultiModalTunerModule
+hparams:
+  n_heads:
+    - 4
+    - 8
+  n_layers:
+    - 2
+    - 3
+    - 4
+  attn_dropout:
+    low: 0.1
+    high: 0.5
+    log: False
+  relu_dropout:
+    low: 0.1
+    high: 0.5
+    log: False
+  res_dropout:
+    low: 0.1
+    high: 0.5
+    log: False
+  emb_dropout:
+    low: 0.1
+    high: 0.5
+    log: False
+  out_dropout:
+    low: 0.1
+    high: 0.5
+    log: False
+  attn_mask:
+    - True
+    - False
+  scale_embedding:
+    - True
+    - False
+  lr:
+    low: 0.000005
+    high: 0.00005
+    log: False
+  t_max:
+    low: 25
+    high: 100
+    log: False
+  eta_min:
+    low: 0.0000001
+    high: 0.0000005
+    log: False
+
+module_params:
+  d_model: 1024
+  num_classes: 7
+  average: macro
+  interval: step
+  device: -1
+  accelerator: gpu
+  strategy: ddp
+  log_steps: 10
+  precision: 32
+  max_epochs: ${epoch}
+
+num_trials: ${num_trials}
+seed: ${seed}
+model_name: ${model_name}
+save_path: ${save_path}
