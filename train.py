@@ -6,7 +6,7 @@ from pytorch_lightning.utilities.distributed import rank_zero_info
 from src.pipeline.pipeline import train
 
 
-@hydra.main(config_path="configs/", config_name="etri_basic_multimodal_train.yaml")
+@hydra.main(config_path="configs/", config_name="kemdy19_multimodal_multimodal_train.yaml")
 def main(config: DictConfig,) -> None:
     rank_zero_info(OmegaConf.to_yaml(config))
     return train(config)
