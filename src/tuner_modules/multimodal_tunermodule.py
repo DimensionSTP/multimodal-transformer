@@ -163,10 +163,8 @@ class MultiModalTunerModule():
         )
 
         trainer = Trainer(
-            # devices=self.module_params.device,
             devices=1,
             accelerator=self.module_params.accelerator,
-            # strategy=self.module_params.strategy,
             logger=True,
             log_every_n_steps=self.module_params.log_steps,
             precision=self.module_params.precision,

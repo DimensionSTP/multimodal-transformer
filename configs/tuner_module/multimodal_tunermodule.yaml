@@ -51,9 +51,7 @@ module_params:
   num_classes: 7
   average: macro
   interval: step
-  device: -1
   accelerator: gpu
-  strategy: ddp
   log_steps: 10
   precision: 32
   max_epochs: ${epoch}
