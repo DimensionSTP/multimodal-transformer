@@ -8,6 +8,7 @@
 *.pth
 *.npy
 *__pycache__
+tmp*
 data/
 logs/runs/
 logs/wandb/
