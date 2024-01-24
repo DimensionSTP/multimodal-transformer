@@ -1,4 +1,4 @@
-_target_: src.architecture_modules.basic_archimodule.MultiModalPlModule
+_target_: src.architecture_modules.multimodal_archimodule.MultiModalPlModule
 
 model:
   _target_: src.architecture_modules.models.multimodal_transformer.MultiModalTransformer
