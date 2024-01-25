@@ -30,7 +30,6 @@ def train(config: DictConfig,) -> None:
         val_dataloaders=val_loader,
     )
 
-
 def test(config: DictConfig,) -> None:
 
     if "seed" in config:
