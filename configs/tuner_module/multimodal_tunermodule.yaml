@@ -48,7 +48,7 @@ hparams:
 
 module_params:
   d_model: 1024
-  num_classes: 7
+  num_classes: ${num_labels}
   average: macro
   interval: step
   accelerator: gpu

@@ -7,18 +7,18 @@ model:
   n_layers: ${n_layers}
   d_audio: 1024
   d_text: 1024
-  n_classes: 7
-  attn_dropout: .3
-  relu_dropout: .3
-  res_dropout: .3
-  emb_dropout: .3
-  out_dropout: .3
-  attn_mask: True
-  scale_embedding: True
+  n_classes: ${num_labels}
+  attn_dropout: ${attn_dropout}
+  relu_dropout: ${relu_dropout}
+  res_dropout: ${res_dropout}
+  emb_dropout: ${emb_dropout}
+  out_dropout: ${out_dropout}
+  attn_mask: ${attn_mask}
+  scale_embedding: ${scale_embedding}
 
-num_classes: 7
+num_classes: ${num_labels}
 average: macro
-lr: 0.00001
-t_max: 50
-eta_min: 0.0000025
+lr: ${lr}
+t_max: ${t_max}
+eta_min: ${eta_min}
 interval: step
