@@ -32,6 +32,13 @@ python unimodal_audio_main.py
 python unimodal_text_main.py
 ```
 
+### Multi Modal Model Hyper-Parameters Tuning
+
+* multimodal transformer(embedding vector deep fusion)
+```shell
+python tune.py
+```
+
 ### Multi Modal Training
 
 * multimodal transformer(embedding vector deep fusion)
