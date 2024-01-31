@@ -4,7 +4,7 @@ from omegaconf import DictConfig
 from pytorch_lightning import Trainer, seed_everything
 
 from ..utils.setup import SetUp
-from ..tuner_modules.multimodal_tunermodule import MultiModalTunerModule
+from ..tuners.multimodal_tuner import MultiModalTuner
 
 
 def train(config: DictConfig,) -> None:
@@ -16,7 +16,7 @@ def train(config: DictConfig,) -> None:
 
     train_loader = setup.get_train_loader()
     val_loader = setup.get_val_loader()
-    architecture_module = setup.get_architecture_module()
+    architecture = setup.get_architecture()
     callbacks = setup.get_callbacks()
     logger = setup.get_wandb_logger()
 
@@ -25,7 +25,7 @@ def train(config: DictConfig,) -> None:
     )
 
     trainer.fit(
-        model=architecture_module,
+        model=architecture,
         train_dataloaders=train_loader,
         val_dataloaders=val_loader,
     )
@@ -38,7 +38,7 @@ def test(config: DictConfig,) -> None:
     setup = SetUp(config)
 
     test_loader = setup.get_test_loader()
-    architecture_module = setup.get_architecture_module()
+    architecture = setup.get_architecture()
     callbacks = setup.get_callbacks()
     logger = setup.get_wandb_logger()
 
@@ -47,7 +47,7 @@ def test(config: DictConfig,) -> None:
     )
 
     trainer.test(
-        model=architecture_module, dataloaders=test_loader, ckpt_path=config.ckpt_path
+        model=architecture, dataloaders=test_loader, ckpt_path=config.ckpt_path
     )
 
 def tune(config: DictConfig,) -> None:
@@ -60,7 +60,7 @@ def tune(config: DictConfig,) -> None:
     train_loader = setup.get_train_loader()
     val_loader = setup.get_val_loader()
 
-    tuner_module: MultiModalTunerModule = instantiate(
-        config.tuner_module, train_loader=train_loader, val_loader=val_loader
+    tuner: MultiModalTuner = instantiate(
+        config.tuner, train_loader=train_loader, val_loader=val_loader
     )
-    tuner_module()
+    tuner()

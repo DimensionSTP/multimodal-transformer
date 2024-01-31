@@ -13,11 +13,11 @@ from optuna.integration import PyTorchLightningPruningCallback
 from optuna.samplers import TPESampler
 from optuna.pruners import HyperbandPruner
 
-from ..architecture_modules.multimodal_archimodule import MultiModalPlModule
-from ..architecture_modules.models.multimodal_transformer import MultiModalTransformer
+from ..architectures.multimodal_architecture import MultiModalArchitecture
+from ..architectures.models.multimodal_transformer import MultiModalTransformer
 
 
-class MultiModalTunerModule():
+class MultiModalTuner():
     def __init__(
         self,
         hparams: Dict[str, Any],
@@ -152,7 +152,7 @@ class MultiModalTunerModule():
             attn_mask=params["attn_mask"],
             scale_embedding=params["scale_embedding"],
         )
-        architecture_module = MultiModalPlModule(
+        architecture_module = MultiModalArchitecture(
             model=model,
             num_classes=self.module_params.num_classes,
             average=self.module_params.average,

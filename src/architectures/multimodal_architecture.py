@@ -8,7 +8,7 @@ from torchmetrics import MetricCollection, F1Score, Accuracy
 import pytorch_lightning as pl
 
 
-class MultiModalPlModule(pl.LightningModule):
+class MultiModalArchitecture(pl.LightningModule):
     def __init__(
         self,
         model: nn.Module,
@@ -19,7 +19,7 @@ class MultiModalPlModule(pl.LightningModule):
         eta_min: float,
         interval: str,
     ) -> None:
-        super(MultiModalPlModule, self).__init__()
+        super(MultiModalArchitecture, self).__init__()
         self.model = model
         self.lr = lr
         self.t_max = t_max

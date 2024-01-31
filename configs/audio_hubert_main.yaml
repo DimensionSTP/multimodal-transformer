@@ -1,7 +1,7 @@
 # @package _global_
 defaults:
-  - dataset_module: unimodal_audio_kemdy_dataset
-  - training_arguments: unimodal_training_arguments
+  - dataset: audio_kemdy19_dataset
+  - training_arguments: training_arguments
   - hydra: hydra
 
 project_dir: /home/ddang/multimodal-transformer

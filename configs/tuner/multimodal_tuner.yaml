@@ -1,4 +1,4 @@
-_target_: src.tuner_modules.multimodal_tunermodule.MultiModalTunerModule
+_target_: src.tuners.multimodal_tuner.MultiModalTuner
 hparams:
   n_heads:
     - 4

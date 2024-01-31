@@ -1,7 +1,7 @@
-_target_: src.architecture_modules.multimodal_archimodule.MultiModalPlModule
+_target_: src.architectures.multimodal_architecture.MultiModalArchitecture
 
 model:
-  _target_: src.architecture_modules.models.multimodal_transformer.MultiModalTransformer
+  _target_: src.architectures.models.multimodal_transformer.MultiModalTransformer
   d_model: ${d_model}
   n_heads: ${n_heads}
   n_layers: ${n_layers}

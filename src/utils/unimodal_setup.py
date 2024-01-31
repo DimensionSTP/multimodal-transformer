@@ -23,19 +23,19 @@ class SetUp:
 
     def get_train_dataset(self) -> Dataset:
         train_dataset: Dataset = instantiate(
-            self.config.dataset_module, data_path=self.config.data_path.train
+            self.config.dataset, data_path=self.config.data_path.train
         )
         return train_dataset
 
     def get_val_dataset(self) -> Dataset:
         val_dataset: Dataset = instantiate(
-            self.config.dataset_module, data_path=self.config.data_path.val
+            self.config.dataset, data_path=self.config.data_path.val
         )
         return val_dataset
 
     def get_test_dataset(self) -> Dataset:
         test_dataset: Dataset = instantiate(
-            self.config.dataset_module, data_path=self.config.data_path.test
+            self.config.dataset, data_path=self.config.data_path.test
         )
         return test_dataset
 

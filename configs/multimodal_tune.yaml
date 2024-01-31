@@ -1,7 +1,7 @@
 # @package _global_
 defaults:
-  - dataset_module: multimodal_kemdy_dataset
-  - tuner_module: multimodal_tunermodule
+  - dataset: multimodal_kemdy19_dataset
+  - tuner: multimodal_tuner
   - hydra: hydra
 
 project_dir: /home/ddang/multimodal-transformer
