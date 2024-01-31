@@ -10,8 +10,8 @@ from transformers import Trainer
 from ..utils.unimodal_setup import SetUp
 
 
-def pipeline(config: DictConfig, modality: str,) -> None:
-    setup = SetUp(config, modality)
+def pipeline(config: DictConfig,) -> None:
+    setup = SetUp(config)
 
     train_dataset = setup.get_train_dataset()
     val_dataset = setup.get_val_dataset()
