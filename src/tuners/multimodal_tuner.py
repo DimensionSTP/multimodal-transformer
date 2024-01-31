@@ -157,7 +157,7 @@ class MultiModalTuner():
             attn_mask=params["attn_mask"],
             scale_embedding=params["scale_embedding"],
         )
-        architecture_module = MultiModalArchitecture(
+        architecture = MultiModalArchitecture(
             model=model,
             num_classes=self.module_params.num_classes,
             average=self.module_params.average,
@@ -183,7 +183,7 @@ class MultiModalTuner():
 
         try:
             trainer.fit(
-                model=architecture_module,
+                model=architecture,
                 train_dataloaders=self.train_loader,
                 val_dataloaders=self.val_loader,
             )
