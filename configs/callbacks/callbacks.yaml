@@ -5,8 +5,8 @@ model_checkpoint:
   save_top_k: 3
   save_last: True
   verbose: True
-  dirpath: ${project_dir}/checkpoints/
-  filename: ${model_name}-bs${batch_size}-epoch{epoch}
+  dirpath: ${project_dir}/checkpoints/${model_name}/${dataset_name}
+  filename: ${save_detail}-epoch{epoch}
   auto_insert_metric_name: False
 
 early_stopping:
