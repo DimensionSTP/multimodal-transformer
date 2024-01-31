@@ -29,7 +29,7 @@ class KEMDy19Dataset(Dataset):
         audio_conv_stride: List[int],
         device: str,
     ) -> None:
-        super(KEMDy19Dataset, self).__init__()
+        super().__init__()
         self.data_path = data_path
         self.audio_feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained(
             pretrained_hubert

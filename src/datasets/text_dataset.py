@@ -11,7 +11,7 @@ from transformers import AutoTokenizer
 
 class KEMDy19Dataset(Dataset):
     def __init__(self, data_path: str, pretrained_model: str, text_max_length: int):
-        super(KEMDy19Dataset, self).__init__()
+        super().__init__()
         self.data_path = data_path
         self.text_tokenizer = AutoTokenizer.from_pretrained(pretrained_model)
         self.text_max_length = text_max_length

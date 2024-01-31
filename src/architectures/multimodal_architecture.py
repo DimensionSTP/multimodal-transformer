@@ -19,7 +19,7 @@ class MultiModalArchitecture(LightningModule):
         eta_min: float,
         interval: str,
     ) -> None:
-        super(MultiModalArchitecture, self).__init__()
+        super().__init__()
         self.model = model
         self.lr = lr
         self.t_max = t_max

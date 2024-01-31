@@ -14,7 +14,7 @@ class TransformerBlock(nn.Module):
     def __init__(
         self, d_model: int, n_heads: int, attn_dropout: float, res_dropout: float,
     ) -> None:
-        super(TransformerBlock, self).__init__()
+        super().__init__()
         self.layer_norm = nn.LayerNorm(d_model)
         self.attn = nn.MultiheadAttention(
             d_model, n_heads, dropout=attn_dropout, batch_first=True
@@ -52,7 +52,7 @@ class FeedForwardBlock(nn.Module):
     def __init__(
         self, d_model: int, d_feed_forward: int, relu_dropout: float, res_dropout: float,
     ) -> None:
-        super(FeedForwardBlock, self).__init__()
+        super().__init__()
         self.layer_norm = nn.LayerNorm(d_model)
         self.feed_forward1 = nn.Linear(d_model, d_feed_forward)
         self.dropout1 = nn.Dropout(relu_dropout)
@@ -78,7 +78,7 @@ class EncoderBlock(nn.Module):
         relu_dropout: float,
         res_dropout: float,
     ) -> None:
-        super(EncoderBlock, self).__init__()
+        super().__init__()
         self.transformer = TransformerBlock(d_model, n_heads, attn_dropout, res_dropout)
         self.feed_forward = FeedForwardBlock(
             d_model, d_feed_forward, res_dropout, relu_dropout
@@ -120,7 +120,7 @@ class CrossModalTransformer(nn.Module):
         attn_mask: bool,
         scale_embedding: bool,
     ) -> None:
-        super(CrossModalTransformer, self).__init__()
+        super().__init__()
         self.attn_mask = attn_mask
         self.emb_scale = math.sqrt(d_model) if scale_embedding else 1.0
         self.pos_emb = SinusoidalPositionalEmbedding(d_model, 0, init_size=249)
@@ -176,7 +176,7 @@ class MultiModalTransformer(nn.Module):
         attn_mask: bool = True,
         scale_embedding: bool = True,
     ) -> None:
-        super(MultiModalTransformer, self).__init__()
+        super().__init__()
         combined_dim = d_model * 2
 
         self.audio_encoder = nn.Conv1d(d_audio, d_model, 3, padding=1, bias=True)
