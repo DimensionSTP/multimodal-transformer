@@ -41,4 +41,4 @@ run_name: ${project_name}-${modality}
 work_dir: ${hydra:runtime.cwd}
 
 output_directory: ${project_dir}/checkpoints/${modality}
-save_predictions: ${project_dir}/preds/unimodal/${modality}.npy
+save_predictions: ${project_dir}/preds/unimodal

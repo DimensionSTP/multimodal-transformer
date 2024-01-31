@@ -1,3 +1,4 @@
+import os
 from typing import Tuple, Dict
 
 from omegaconf import DictConfig
@@ -39,7 +40,9 @@ def pipeline(config: DictConfig,) -> None:
     trainer.evaluate()
     pred = trainer.predict(test_dataset)
     predictions = pred.predictions
-    np.save(config.save_predictions, predictions)
+    if not os.path.exists(config.save_predictions):
+        os.makedirs(config.save_predictions)
+    np.save(f"{config.save_predictions}/{config.modality}.npy", predictions)
     test = pd.read_pickle(config.data_path.test)
     test = test.dropna()
     y_pred = np.argmax(predictions, 1)
