@@ -2,7 +2,6 @@ from hydra.utils import instantiate
 from omegaconf import DictConfig
 
 from pytorch_lightning import Trainer, seed_everything
-import wandb
 
 from ..utils.setup import SetUp
 from ..tuners.multimodal_tuner import MultiModalTuner
@@ -44,16 +43,16 @@ def train(config: DictConfig,) -> None:
             train_dataloaders=train_loader,
             val_dataloaders=val_loader,
         )
-        wandb.alert(
+        logger.experiment.alert(
             title="Training Complete",
             text="Training process has successfully finished.",
-            level=wandb.AlertLevel.INFO,
+            level="INFO",
         )
     except Exception as e:
-        wandb.alert(
+        logger.experiment.alert(
             title="Training Error", 
             text="An error occurred during training", 
-            level=wandb.AlertLevel.ERROR
+            level="ERROR",
         )
         raise e
 
@@ -88,18 +87,20 @@ def test(config: DictConfig,) -> None:
 
     try:
         trainer.test(
-            model=architecture, dataloaders=test_loader, ckpt_path=config.ckpt_path
+            model=architecture, 
+            dataloaders=test_loader, 
+            ckpt_path=config.ckpt_path,
         )
-        wandb.alert(
+        logger.experiment.alert(
             title="Testing Complete",
             text="Testing process has successfully finished.",
-            level=wandb.AlertLevel.INFO,
+            level="INFO",
         )
     except Exception as e:
-        wandb.alert(
+        logger.experiment.alert(
             title="Testing Error", 
             text="An error occurred during testing", 
-            level=wandb.AlertLevel.ERROR
+            level="ERROR",
         )
         raise e
 
@@ -112,8 +113,10 @@ def tune(config: DictConfig,) -> None:
 
     train_loader = setup.get_train_loader()
     val_loader = setup.get_val_loader()
+    callbacks = setup.get_callbacks()
+    logger = setup.get_wandb_logger()
 
     tuner: MultiModalTuner = instantiate(
-        config.tuner, train_loader=train_loader, val_loader=val_loader
+        config.tuner, train_loader=train_loader, val_loader=val_loader, callbacks=callbacks, logger=logger
     )
     tuner()

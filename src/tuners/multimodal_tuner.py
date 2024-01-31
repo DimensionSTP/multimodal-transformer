@@ -1,5 +1,5 @@
 import os
-from typing import Dict, Any, Tuple
+from typing import Dict, Any, List
 import json
 import warnings
 warnings.filterwarnings("ignore")
@@ -7,14 +7,15 @@ warnings.filterwarnings("ignore")
 from torch.utils.data import DataLoader
 
 from pytorch_lightning import Trainer, seed_everything
+from pytorch_lightning.loggers import WandbLogger
 
 import optuna
 from optuna.integration import PyTorchLightningPruningCallback
 from optuna.samplers import TPESampler
 from optuna.pruners import HyperbandPruner
 
-from ..architectures.multimodal_architecture import MultiModalArchitecture
 from ..architectures.models.multimodal_transformer import MultiModalTransformer
+from ..architectures.multimodal_architecture import MultiModalArchitecture
 
 
 class MultiModalTuner():
@@ -22,20 +23,24 @@ class MultiModalTuner():
         self,
         hparams: Dict[str, Any],
         module_params: Dict[str, Any],
-        train_loader: DataLoader,
-        val_loader: DataLoader,
         num_trials: int,
         seed: int,
         model_name: str,
-        save_path: str,
+        hparams_save_path: str,
+        train_loader: DataLoader,
+        val_loader: DataLoader,
+        callbacks: List[Any],
+        logger:  WandbLogger,
     ) -> None:
         self.hparams = hparams
         self.module_params = module_params
+        self.num_trials = num_trials
+        self.hparams_save_path = hparams_save_path
+        self.seed = seed
         self.train_loader = train_loader
         self.val_loader = val_loader
-        self.num_trials = num_trials
-        self.save_path = f"{save_path}/{model_name}/{num_trials}_trials"
-        self.seed = seed
+        self.callabacks = callbacks
+        self.logger = logger
 
     def __call__(self) -> None:
         study=optuna.create_study(direction="maximize", sampler=TPESampler(seed=self.seed), pruner=HyperbandPruner())
@@ -46,10 +51,10 @@ class MultiModalTuner():
         print(f"Best score : {best_score}")
         print(f"Parameters : {best_params}")
 
-        if not os.path.exists(self.save_path):
-            os.makedirs(self.save_path, exist_ok=True)
+        if not os.path.exists(self.hparams_save_path):
+            os.makedirs(self.hparams_save_path, exist_ok=True)
 
-        with open(f"{self.save_path}/best_params.json", "w") as json_file:
+        with open(f"{self.hparams_save_path}/best_params.json", "w") as json_file:
             json.dump(best_params, json_file)
 
     def optuna_objective(
@@ -162,21 +167,37 @@ class MultiModalTuner():
             interval=self.module_params.interval,
         )
 
+        pruning_callback = PyTorchLightningPruningCallback(trial, monitor="val_MulticlassF1Score")
+        self.callabacks.append(pruning_callback)
+        self.logger.log_hyperparams(params)
+
         trainer = Trainer(
             devices=1,
             accelerator=self.module_params.accelerator,
-            logger=True,
             log_every_n_steps=self.module_params.log_steps,
             precision=self.module_params.precision,
             max_epochs=self.module_params.max_epochs,
-            enable_checkpointing=False,
-            callbacks=[PyTorchLightningPruningCallback(trial, monitor="val_MulticlassF1Score")],
+            callbacks=self.callabacks,
+            logger=self.logger,
         )
-        trainer.logger.log_hyperparams(params)
-        trainer.fit(
-            model=architecture_module,
-            train_dataloaders=self.train_loader,
-            val_dataloaders=self.val_loader,
-        )
+
+        try:
+            trainer.fit(
+                model=architecture_module,
+                train_dataloaders=self.train_loader,
+                val_dataloaders=self.val_loader,
+            )
+            self.logger.experiment.alert(
+                title="Tuning Complete",
+                text="Tuning process has successfully finished.",
+                level="INFO",
+            )
+        except Exception as e:
+            self.logger.experiment.alert(
+                title="Tuning Error", 
+                text="An error occurred during tuning", 
+                level="ERROR",
+            )
+            raise e
 
         return trainer.callback_metrics["val_MulticlassF1Score"].item()

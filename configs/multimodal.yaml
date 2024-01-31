@@ -42,8 +42,9 @@ model_name: MultiModalTransformer
 dataset_name: KEMDy19
 
 is_tuned: True
-num_trials: 5
-tuned_hparams_path: ${project_dir}/hparams/${model_name}/${dataset_name}/${num_trials}_trials/best_params.json
+num_trials: 3
+hparams_save_path: ${project_dir}/hparams/${model_name}/${dataset_name}/${num_trials}_trials
+tuned_hparams_path: ${hparams_save_path}/best_params.json
 
 project_name: ${model_name}-${dataset_name}
 save_detail: d_model${d_model}-n_heads${n_heads}-n_layers${n_layers}-bs${batch_size}
