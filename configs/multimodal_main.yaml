@@ -1,0 +1,53 @@
+# @package _global_
+defaults:
+  - dataset: multimodal_kemdy19_dataset
+  - architecture: multimodal_architecture
+  - tuner: multimodal_tuner
+  - logger: wandb
+  - hydra: hydra
+  - callbacks: callbacks
+  - trainer: trainer
+
+project_dir: /home/ddang/multimodal-transformer
+
+seed: 2024
+
+num_labels: 7
+
+data_path:
+  train: ${project_dir}/path_data/path_train.pkl
+  val: ${project_dir}/path_data/path_val.pkl
+  test: ${project_dir}/path_data/path_test.pkl
+
+batch_size: 64
+
+d_model: 1024
+n_heads: 8
+n_layers: 4
+attn_dropout: .3
+relu_dropout: .3
+res_dropout: .3
+emb_dropout: .3
+out_dropout: .3
+attn_mask: True
+scale_embedding: True
+
+lr: 0.00001
+t_max: 50
+eta_min: 0.0000025
+
+is_tuned: True
+num_trials: 4
+tuned_hparams_path: ${project_dir}/hparams/${dataset_name}-${project_name}/${num_trials}_trials/best_params.json
+
+dataset_name: KEMDy19
+project_name: MultiModalTransformer
+model_name: ${dataset_name}-${project_name}-d_model${d_model}-n_heads${n_heads}-n_layers${n_layers}
+
+mode: train
+run_name: ${model_name}-${mode}
+work_dir: ${hydra:runtime.cwd}
+
+tags: ${model_name}
+
+epoch: 20
