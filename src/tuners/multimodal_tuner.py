@@ -25,7 +25,6 @@ class MultiModalTuner():
         module_params: Dict[str, Any],
         num_trials: int,
         seed: int,
-        model_name: str,
         hparams_save_path: str,
         train_loader: DataLoader,
         val_loader: DataLoader,
