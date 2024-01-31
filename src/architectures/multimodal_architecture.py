@@ -5,10 +5,10 @@ from torch import optim, nn
 from torch.nn import functional as F
 from torchmetrics import MetricCollection, F1Score, Accuracy
 
-import pytorch_lightning as pl
+from pytorch_lightning import LightningModule
 
 
-class MultiModalArchitecture(pl.LightningModule):
+class MultiModalArchitecture(LightningModule):
     def __init__(
         self,
         model: nn.Module,
