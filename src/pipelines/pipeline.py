@@ -2,6 +2,7 @@ from hydra.utils import instantiate
 from omegaconf import DictConfig
 
 from pytorch_lightning import Trainer, seed_everything
+import wandb
 
 from ..utils.setup import SetUp
 from ..tuners.multimodal_tuner import MultiModalTuner
@@ -20,28 +21,41 @@ def train(config: DictConfig,) -> None:
     callbacks = setup.get_callbacks()
     logger = setup.get_wandb_logger()
 
-    logger_config = {}
+    logged_hparams = {}
     for key, value in config.architecture.items():
         if key != "_target_" and key != "model":
-            logger_config[key] = value
+            logged_hparams[key] = value
     if "model" in config.architecture:
         for key, value in config.architecture["model"].items():
             if key != "_target_":
-                logger_config[key] = value
-    logger_config["batch_size"] = config.batch_size
-    logger_config["epoch"] = config.epoch
-    logger_config["seed"] = config.seed
-    logger.experiment.config.update(logger_config)
+                logged_hparams[key] = value
+    logged_hparams["batch_size"] = config.batch_size
+    logged_hparams["epoch"] = config.epoch
+    logged_hparams["seed"] = config.seed
+    logger.log_hyperparams(logged_hparams)
 
     trainer: Trainer = instantiate(
         config.trainer, callbacks=callbacks, logger=logger, _convert_="partial"
     )
 
-    trainer.fit(
-        model=architecture,
-        train_dataloaders=train_loader,
-        val_dataloaders=val_loader,
-    )
+    try:
+        trainer.fit(
+            model=architecture,
+            train_dataloaders=train_loader,
+            val_dataloaders=val_loader,
+        )
+        wandb.alert(
+            title="Training Complete",
+            text="Training process has successfully finished.",
+            level=wandb.AlertLevel.INFO,
+        )
+    except Exception as e:
+        wandb.alert(
+            title="Training Error", 
+            text="An error occurred during training", 
+            level=wandb.AlertLevel.ERROR
+        )
+        raise e
 
 def test(config: DictConfig,) -> None:
 
@@ -55,26 +69,39 @@ def test(config: DictConfig,) -> None:
     callbacks = setup.get_callbacks()
     logger = setup.get_wandb_logger()
 
-    logger_config = {}
+    logged_hparams = {}
     for key, value in config.architecture.items():
         if key != "_target_" and key != "model":
-            logger_config[key] = value
+            logged_hparams[key] = value
     if "model" in config.architecture:
         for key, value in config.architecture["model"].items():
             if key != "_target_":
-                logger_config[key] = value
-    logger_config["batch_size"] = config.batch_size
-    logger_config["epoch"] = config.epoch
-    logger_config["seed"] = config.seed
-    logger.experiment.config.update(logger_config)
+                logged_hparams[key] = value
+    logged_hparams["batch_size"] = config.batch_size
+    logged_hparams["epoch"] = config.epoch
+    logged_hparams["seed"] = config.seed
+    logger.log_hyperparams(logged_hparams)
 
     trainer: Trainer = instantiate(
         config.trainer, callbacks=callbacks, logger=logger, _convert_="partial"
     )
 
-    trainer.test(
-        model=architecture, dataloaders=test_loader, ckpt_path=config.ckpt_path
-    )
+    try:
+        trainer.test(
+            model=architecture, dataloaders=test_loader, ckpt_path=config.ckpt_path
+        )
+        wandb.alert(
+            title="Testing Complete",
+            text="Testing process has successfully finished.",
+            level=wandb.AlertLevel.INFO,
+        )
+    except Exception as e:
+        wandb.alert(
+            title="Testing Error", 
+            text="An error occurred during testing", 
+            level=wandb.AlertLevel.ERROR
+        )
+        raise e
 
 def tune(config: DictConfig,) -> None:
 
