@@ -53,4 +53,9 @@ python main.py mode=train is_tuned={bool}
 python main.py mode=test is_tuned={bool} epoch={ckpt epoch}
 ```
 
-You can set additional arguments through the command line.
+
+__If you want to change main config, use --config-name={config_name}.__
+
+__Also, you can use --multirun option.__
+
+__You can set additional arguments through the command line.__
