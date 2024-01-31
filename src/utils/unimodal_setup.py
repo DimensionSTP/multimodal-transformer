@@ -17,9 +17,8 @@ from datasets.metric import Metric
 
 
 class SetUp:
-    def __init__(self, config: DictConfig, modality: str,) -> None:
+    def __init__(self, config: DictConfig,) -> None:
         self.config = config
-        self.modality = modality
 
     def get_train_dataset(self) -> Dataset:
         train_dataset: Dataset = instantiate(
@@ -40,13 +39,13 @@ class SetUp:
         return test_dataset
 
     def get_tokenizer(self) -> Union[AutoTokenizer, Wav2Vec2FeatureExtractor]:
-        if self.modality == "audio":
+        if self.config.modality == "audio":
             tokenizer = Wav2Vec2FeatureExtractor.from_pretrained(
-                pretrained_model_name_or_path=self.config.pretrained_model_name,
+                pretrained_model_name_or_path=self.config.audio_pretrained_model_name,
             )
-        elif self.modality == "text":
+        elif self.config.modality == "text":
             tokenizer = AutoTokenizer.from_pretrained(
-                pretrained_model_name_or_path=self.config.pretrained_model_name,
+                pretrained_model_name_or_path=self.config.text_pretrained_model_name,
             )
         else:
             raise Exception("Only text or audio can be training modality")
@@ -55,15 +54,15 @@ class SetUp:
     def get_model(
         self,
     ) -> Union[AutoModelForSequenceClassification, HubertForSequenceClassification]:
-        if self.modality == "audio":
+        if self.config.modality == "audio":
             model = HubertForSequenceClassification.from_pretrained(
-                pretrained_model_name_or_path=self.config.pretrained_model_name,
+                pretrained_model_name_or_path=self.config.audio_pretrained_model_name,
                 num_labels=self.config.num_labels,
                 output_hidden_states=self.config.output_hidden_states,
             )
-        elif self.modality == "text":
+        elif self.config.modality == "text":
             model = AutoModelForSequenceClassification.from_pretrained(
-                pretrained_model_name_or_path=self.config.pretrained_model_name,
+                pretrained_model_name_or_path=self.config.text_pretrained_model_name,
                 num_labels=self.config.num_labels,
                 output_hidden_states=self.config.output_hidden_states,
             )
