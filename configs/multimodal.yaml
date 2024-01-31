@@ -47,6 +47,7 @@ tuned_hparams_path: ${project_dir}/hparams/${model_name}/${dataset_name}/${num_t
 
 project_name: ${model_name}-${dataset_name}
 save_detail: d_model${d_model}-n_heads${n_heads}-n_layers${n_layers}-bs${batch_size}
+ckpt_path: ${callbacks.model_checkpoint.dirpath}/${callbacks.model_checkpoint.filename}.ckpt
 
 mode: train
 run_name: ${project_name}-${mode}
