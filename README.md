@@ -20,35 +20,37 @@ conda activate myenv
 pip install -r requirements.txt
 ```
 
-### Single Modal Training
+### Single Modality Training
 
 * only audio
 ```shell
-python unimodal_audio_main.py
+python unimodal_main.py modality=audio dataset=audio_kemdy19_dataset
 ```
 
 * only text
 ```shell
-python unimodal_text_main.py
+python unimodal_main.py modality=text dataset=text_kemdy19_dataset
 ```
 
-### Multi Modal Model Hyper-Parameters Tuning
+### Multi Modality Model Hyper-Parameters Tuning
 
 * multimodal transformer(embedding vector deep fusion)
 ```shell
-python tune.py
+python main.py mode=tune is_tuned=False
 ```
 
-### Multi Modal Training
+### Multi Modality Training
 
 * multimodal transformer(embedding vector deep fusion)
 ```shell
-python train.py
+python main.py mode=train is_tuned={bool}
 ```
 
-### Multi Modal Testing
+### Multi Modality Testing
 
 * multimodal transformer(embedding vector deep fusion)
 ```shell
-python test.py
+python main.py mode=test is_tuned={bool} epoch={ckpt epoch}
 ```
+
+You can set additional arguments through the command line.
