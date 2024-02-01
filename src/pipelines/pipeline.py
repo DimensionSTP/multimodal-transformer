@@ -113,10 +113,9 @@ def tune(config: DictConfig,) -> None:
 
     train_loader = setup.get_train_loader()
     val_loader = setup.get_val_loader()
-    callbacks = setup.get_callbacks()
     logger = setup.get_wandb_logger()
 
     tuner: MultiModalTuner = instantiate(
-        config.tuner, train_loader=train_loader, val_loader=val_loader, callbacks=callbacks, logger=logger
+        config.tuner, train_loader=train_loader, val_loader=val_loader, logger=logger
     )
     tuner()

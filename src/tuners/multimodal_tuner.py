@@ -28,7 +28,6 @@ class MultiModalTuner():
         hparams_save_path: str,
         train_loader: DataLoader,
         val_loader: DataLoader,
-        callbacks: List[Any],
         logger:  WandbLogger,
     ) -> None:
         self.hparams = hparams
@@ -38,7 +37,6 @@ class MultiModalTuner():
         self.seed = seed
         self.train_loader = train_loader
         self.val_loader = val_loader
-        self.callabacks = callbacks
         self.logger = logger
 
     def __call__(self) -> None:
@@ -167,7 +165,6 @@ class MultiModalTuner():
         )
 
         pruning_callback = PyTorchLightningPruningCallback(trial, monitor="val_MulticlassF1Score")
-        self.callabacks.append(pruning_callback)
         self.logger.log_hyperparams(params)
 
         trainer = Trainer(
@@ -176,7 +173,8 @@ class MultiModalTuner():
             log_every_n_steps=self.module_params.log_steps,
             precision=self.module_params.precision,
             max_epochs=self.module_params.max_epochs,
-            callbacks=self.callabacks,
+            enable_checkpointing=False,
+            callbacks=pruning_callback,
             logger=self.logger,
         )
 
