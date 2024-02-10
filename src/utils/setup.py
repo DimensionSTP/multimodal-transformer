@@ -5,13 +5,16 @@ from hydra.utils import instantiate
 
 from torch.utils.data import Dataset, DataLoader
 
-from pytorch_lightning import LightningModule
-from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
-from pytorch_lightning.loggers import WandbLogger
+from lightning.pytorch import LightningModule
+from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
+from lightning.pytorch.loggers import WandbLogger
 
 
 class SetUp:
-    def __init__(self, config: DictConfig,) -> None:
+    def __init__(
+        self,
+        config: DictConfig,
+    ) -> None:
         self.config = config
 
     def get_train_loader(self) -> DataLoader:
@@ -48,9 +51,7 @@ class SetUp:
         )
 
     def get_architecture(self) -> LightningModule:
-        architecture: LightningModule = instantiate(
-            self.config.architecture
-        )
+        architecture: LightningModule = instantiate(self.config.architecture)
         return architecture
 
     def get_callbacks(self) -> List[Any]:
