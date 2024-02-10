@@ -5,7 +5,7 @@ from torch import optim, nn
 from torch.nn import functional as F
 from torchmetrics import MetricCollection, F1Score, Accuracy
 
-from pytorch_lightning import LightningModule
+from lightning.pytorch import LightningModule
 
 
 class MultiModalArchitecture(LightningModule):
@@ -48,7 +48,12 @@ class MultiModalArchitecture(LightningModule):
         )
         return output
 
-    def step(self, batch: Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor],) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    def step(
+        self,
+        batch: Tuple[
+            torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor
+        ],
+    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         audio, audio_mask, text, text_mask, label = batch
         output = self(
             audio=audio, audio_mask=audio_mask, text=text, text_mask=text_mask
@@ -67,7 +72,13 @@ class MultiModalArchitecture(LightningModule):
             "lr_scheduler": {"scheduler": cosine_scheduler, "interval": self.interval},
         }
 
-    def training_step(self, batch: Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor], batch_idx: int,) -> Dict[str, torch.Tensor]:
+    def training_step(
+        self,
+        batch: Tuple[
+            torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor
+        ],
+        batch_idx: int,
+    ) -> Dict[str, torch.Tensor]:
         loss, pred, label = self.step(batch)
         metrics = self.train_metrics(pred, label)
         self.log(
@@ -83,7 +94,13 @@ class MultiModalArchitecture(LightningModule):
         )
         return {"loss": loss, "pred": pred, "label": label}
 
-    def validation_step(self, batch: Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor], batch_idx: int,) -> Dict[str, torch.Tensor]:
+    def validation_step(
+        self,
+        batch: Tuple[
+            torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor
+        ],
+        batch_idx: int,
+    ) -> Dict[str, torch.Tensor]:
         loss, pred, label = self.step(batch)
         metrics = self.val_metrics(pred, label)
         self.log(
@@ -99,7 +116,13 @@ class MultiModalArchitecture(LightningModule):
         )
         return {"loss": loss, "pred": pred, "label": label}
 
-    def test_step(self, batch: Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor], batch_idx: int,) -> Dict[str, torch.Tensor]:
+    def test_step(
+        self,
+        batch: Tuple[
+            torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor
+        ],
+        batch_idx: int,
+    ) -> Dict[str, torch.Tensor]:
         loss, pred, label = self.step(batch)
         metrics = self.test_metrics(pred, label)
         self.log(
@@ -115,11 +138,11 @@ class MultiModalArchitecture(LightningModule):
         )
         return {"loss": loss, "pred": pred, "label": label}
 
-    def train_epoch_end(self, train_step_outputs: Dict[str, torch.Tensor],) -> None:
+    def on_train_epoch_end(self) -> None:
         self.train_metrics.reset()
 
-    def validation_epoch_end(self, validation_step_outputs: Dict[str, torch.Tensor],) -> None:
+    def on_validation_epoch_end(self) -> None:
         self.val_metrics.reset()
 
-    def test_epoch_end(self, test_step_outputs: Dict[str, torch.Tensor],) -> None:
+    def on_test_epoch_end(self) -> None:
         self.test_metrics.reset()
