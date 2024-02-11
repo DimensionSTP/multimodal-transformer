@@ -2,6 +2,7 @@ import os
 from typing import Dict, Any, List
 import json
 import warnings
+
 warnings.filterwarnings("ignore")
 
 from torch.utils.data import DataLoader
@@ -18,7 +19,7 @@ from ..architectures.models.multimodal_transformer import MultiModalTransformer
 from ..architectures.multimodal_architecture import MultiModalArchitecture
 
 
-class MultiModalTuner():
+class MultiModalTuner:
     def __init__(
         self,
         hparams: Dict[str, Any],
@@ -28,7 +29,7 @@ class MultiModalTuner():
         hparams_save_path: str,
         train_loader: DataLoader,
         val_loader: DataLoader,
-        logger:  WandbLogger,
+        logger: WandbLogger,
     ) -> None:
         self.hparams = hparams
         self.module_params = module_params
@@ -40,7 +41,11 @@ class MultiModalTuner():
         self.logger = logger
 
     def __call__(self) -> None:
-        study=optuna.create_study(direction="maximize", sampler=TPESampler(seed=self.seed), pruner=HyperbandPruner())
+        study = optuna.create_study(
+            direction="maximize",
+            sampler=TPESampler(seed=self.seed),
+            pruner=HyperbandPruner(),
+        )
         study.optimize(self.optuna_objective, n_trials=self.num_trials)
         trial = study.best_trial
         best_score = trial.value
@@ -59,7 +64,7 @@ class MultiModalTuner():
         trial: optuna.trial.Trial,
     ) -> float:
         seed_everything(self.seed)
-        
+
         params = dict()
         params["seed"] = self.seed
         if self.hparams.n_heads:
@@ -164,13 +169,15 @@ class MultiModalTuner():
             interval=self.module_params.interval,
         )
 
-        pruning_callback = PyTorchLightningPruningCallback(trial, monitor="val_MulticlassF1Score")
+        pruning_callback = PyTorchLightningPruningCallback(
+            trial, monitor="val_MulticlassF1Score"
+        )
         self.logger.log_hyperparams(params)
 
         trainer = Trainer(
             devices=1,
             accelerator=self.module_params.accelerator,
-            log_every_n_steps=self.module_params.log_steps,
+            log_every_n_steps=self.module_params.log_every_n_steps,
             precision=self.module_params.precision,
             max_epochs=self.module_params.max_epochs,
             enable_checkpointing=False,
@@ -191,8 +198,8 @@ class MultiModalTuner():
             )
         except Exception as e:
             self.logger.experiment.alert(
-                title="Tuning Error", 
-                text="An error occurred during tuning", 
+                title="Tuning Error",
+                text="An error occurred during tuning",
                 level="ERROR",
             )
             raise e
