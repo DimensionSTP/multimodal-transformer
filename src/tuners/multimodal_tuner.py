@@ -8,7 +8,7 @@ warnings.filterwarnings("ignore")
 from torch.utils.data import DataLoader
 
 from pytorch_lightning import Trainer, seed_everything
-from pytorch_lightning.loggers import WandbLogger
+from pytorch_lightning.loggers.wandb import WandbLogger
 
 import optuna
 from optuna.integration import PyTorchLightningPruningCallback
