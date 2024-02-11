@@ -53,7 +53,10 @@ class KEMDy19Dataset(Dataset):
     def __len__(self) -> int:
         return len(self.labels)
 
-    def __getitem__(self, idx: int,) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, int]:
+    def __getitem__(
+        self,
+        idx: int,
+    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, int]:
         audio = librosa.load(self.audio_path[idx], sr=16000)[0]
         audio_input = self.feature_extract_audio(audio)
         audio_data = {k: torch.tensor(v) for k, v in audio_input.items()}
@@ -69,7 +72,10 @@ class KEMDy19Dataset(Dataset):
 
         return (audio_hidden, audio_mask, text_hidden, text_mask, self.labels[idx])
 
-    def get_audio_padding_mask(self, attention_mask: torch.Tensor,) -> torch.Tensor:
+    def get_audio_padding_mask(
+        self,
+        attention_mask: torch.Tensor,
+    ) -> torch.Tensor:
         output_length = self.get_after_conv_length(
             attention_mask.sum(-1).to(torch.long)
         )
@@ -88,7 +94,10 @@ class KEMDy19Dataset(Dataset):
         attention_mask = attention_mask.cumsum(-1).bool()
         return attention_mask.squeeze()
 
-    def get_after_conv_length(self, input_length: int,) -> int:
+    def get_after_conv_length(
+        self,
+        input_length: int,
+    ) -> int:
         def conv_out_length(input_length: int, kernel_size: int, stride: int) -> int:
             return (input_length - kernel_size) // stride + 1
 
@@ -97,7 +106,10 @@ class KEMDy19Dataset(Dataset):
 
         return input_length
 
-    def get_audio_hidden(self, audio_data: torch.Tensor,) -> torch.Tensor:
+    def get_audio_hidden(
+        self,
+        audio_data: torch.Tensor,
+    ) -> torch.Tensor:
         audio_model = self.audio_model.to(self.device)
         audio_model.eval()
         with torch.no_grad():
@@ -107,7 +119,10 @@ class KEMDy19Dataset(Dataset):
             torch.cuda.empty_cache()
         return hidden.squeeze()
 
-    def feature_extract_audio(self, audio: np.ndarray,) -> torch.Tensor:
+    def feature_extract_audio(
+        self,
+        audio: np.ndarray,
+    ) -> torch.Tensor:
         feature_extractor = self.audio_feature_extractor
         tokenized_audio = feature_extractor(
             audio,
@@ -119,7 +134,10 @@ class KEMDy19Dataset(Dataset):
         )
         return tokenized_audio
 
-    def get_text_padding_mask(self, attention_mask: torch.Tensor,) -> torch.Tensor:
+    def get_text_padding_mask(
+        self,
+        attention_mask: torch.Tensor,
+    ) -> torch.Tensor:
         output_length = attention_mask.sum(-1).to(torch.long)
         batch_size = attention_mask.shape[0]
         attention_mask = torch.zeros(
@@ -136,7 +154,10 @@ class KEMDy19Dataset(Dataset):
         attention_mask = attention_mask.cumsum(-1).bool()
         return attention_mask.squeeze()
 
-    def get_text_hidden(self, text_data: torch.Tensor,) -> torch.Tensor:
+    def get_text_hidden(
+        self,
+        text_data: torch.Tensor,
+    ) -> torch.Tensor:
         text_model = self.text_model.to(self.device)
         text_model.eval()
         with torch.no_grad():
@@ -146,7 +167,10 @@ class KEMDy19Dataset(Dataset):
             torch.cuda.empty_cache()
         return hidden.squeeze()
 
-    def tokenize_text(self, text: str,) -> torch.Tensor:
+    def tokenize_text(
+        self,
+        text: str,
+    ) -> torch.Tensor:
         tokenized_text = self.text_tokenizer(
             text,
             max_length=self.text_max_length,
@@ -157,7 +181,9 @@ class KEMDy19Dataset(Dataset):
         return tokenized_text
 
     @staticmethod
-    def normalize_string(text: str,) -> str:
+    def normalize_string(
+        text: str,
+    ) -> str:
         text = re.sub(r"[\s]", r" ", str(text))
         text = re.sub(r"[^a-zA-Z가-힣ㄱ-ㅎ0-9.!?]+", r" ", str(text))
         return text

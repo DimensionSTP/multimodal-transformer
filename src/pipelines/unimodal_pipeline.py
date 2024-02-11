@@ -11,7 +11,9 @@ from transformers import Trainer
 from ..utils.unimodal_setup import SetUp
 
 
-def pipeline(config: DictConfig,) -> None:
+def pipeline(
+    config: DictConfig,
+) -> None:
     setup = SetUp(config)
 
     train_dataset = setup.get_train_dataset()
@@ -22,7 +24,9 @@ def pipeline(config: DictConfig,) -> None:
     metric = setup.get_metric()
     training_arguments = setup.get_training_arguments()
 
-    def compute_metrics(eval_pred: Tuple[np.ndarray, np.ndarray],) -> Dict[str, float]:
+    def compute_metrics(
+        eval_pred: Tuple[np.ndarray, np.ndarray],
+    ) -> Dict[str, float]:
         predictions, labels = eval_pred
         predictions = np.argmax(predictions, axis=1)
         return metric.compute(predictions=predictions, references=labels)

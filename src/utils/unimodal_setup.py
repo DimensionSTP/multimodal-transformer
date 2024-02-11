@@ -17,7 +17,10 @@ from datasets.metric import Metric
 
 
 class SetUp:
-    def __init__(self, config: DictConfig,) -> None:
+    def __init__(
+        self,
+        config: DictConfig,
+    ) -> None:
         self.config = config
 
     def get_train_dataset(self) -> Dataset:

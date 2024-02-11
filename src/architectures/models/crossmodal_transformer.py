@@ -12,7 +12,11 @@ from fairseq.modules import SinusoidalPositionalEmbedding
 
 class TransformerBlock(nn.Module):
     def __init__(
-        self, d_model: int, n_heads: int, attn_dropout: float, res_dropout: float,
+        self,
+        d_model: int,
+        n_heads: int,
+        attn_dropout: float,
+        res_dropout: float,
     ) -> None:
         super().__init__()
         self.layer_norm = nn.LayerNorm(d_model)
@@ -37,7 +41,9 @@ class TransformerBlock(nn.Module):
         return query + self.dropout(x)
 
     def get_future_mask(
-        self, query: torch.Tensor, key: Optional[torch.Tensor] = None,
+        self,
+        query: torch.Tensor,
+        key: Optional[torch.Tensor] = None,
     ) -> torch.Tensor:
         seq_len_query = query.shape[1]
         seq_len_key = seq_len_query if key is None else key.shape[1]
@@ -50,7 +56,11 @@ class TransformerBlock(nn.Module):
 
 class FeedForwardBlock(nn.Module):
     def __init__(
-        self, d_model: int, d_feed_forward: int, relu_dropout: float, res_dropout: float,
+        self,
+        d_model: int,
+        d_feed_forward: int,
+        relu_dropout: float,
+        res_dropout: float,
     ) -> None:
         super().__init__()
         self.layer_norm = nn.LayerNorm(d_model)
@@ -59,7 +69,10 @@ class FeedForwardBlock(nn.Module):
         self.feed_forward2 = nn.Linear(d_feed_forward, d_model)
         self.dropout2 = nn.Dropout(res_dropout)
 
-    def forward(self, x: torch.Tensor,) -> torch.Tensor:
+    def forward(
+        self,
+        x: torch.Tensor,
+    ) -> torch.Tensor:
         normalized = self.layer_norm(x)
         forwarded = self.feed_forward2(
             self.dropout1(F.relu(self.feed_forward1(normalized)))
@@ -136,7 +149,12 @@ class CrossModalTransformer(nn.Module):
         )
         self.layers = self.get_clone(layer, n_layers)
 
-    def forward(self, query: torch.Tensor, key: torch.Tensor, key_padding_mask: Optional[torch.Tensor] = None,) -> torch.Tensor:
+    def forward(
+        self,
+        query: torch.Tensor,
+        key: torch.Tensor,
+        key_padding_mask: Optional[torch.Tensor] = None,
+    ) -> torch.Tensor:
         # query settings
         pos_query = self.pos_emb(query[:, :, 0])
         query = self.emb_scale * query + pos_query
@@ -155,5 +173,8 @@ class CrossModalTransformer(nn.Module):
         return query
 
     @staticmethod
-    def get_clone(module: nn.Module, iteration: int,) -> ModuleList:
+    def get_clone(
+        module: nn.Module,
+        iteration: int,
+    ) -> ModuleList:
         return ModuleList([copy.deepcopy(module) for _ in range(iteration)])

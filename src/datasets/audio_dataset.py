@@ -26,14 +26,20 @@ class KEMDy19Dataset(Dataset):
     def __len__(self) -> int:
         return len(self.labels)
 
-    def __getitem__(self, idx: int,) -> Dict[str, Any]:
+    def __getitem__(
+        self,
+        idx: int,
+    ) -> Dict[str, Any]:
         audio = librosa.load(self.audio_path[idx], sr=16000)[0]
         audio_input = self.feature_extract_audio(audio)
         item = {key: torch.tensor(val).squeeze() for key, val in audio_input.items()}
         item["labels"] = torch.tensor(self.labels[idx])
         return item
 
-    def feature_extract_audio(self, audio: np.ndarray,) -> torch.Tensor:
+    def feature_extract_audio(
+        self,
+        audio: np.ndarray,
+    ) -> torch.Tensor:
         feature_extractor = self.feature_extractor
         input = feature_extractor(
             audio,
