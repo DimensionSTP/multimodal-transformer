@@ -52,7 +52,7 @@ module_params:
   average: macro
   interval: step
   accelerator: gpu
-  log_steps: 10
+  log_every_n_steps: 10
   precision: 32
   max_epochs: ${epoch}
 
