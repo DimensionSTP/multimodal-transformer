@@ -32,6 +32,9 @@ def train(
     logged_hparams["batch_size"] = config.batch_size
     logged_hparams["epoch"] = config.epoch
     logged_hparams["seed"] = config.seed
+    for key, value in config.trainer.items():
+        if key != "_target_":
+            logged_hparams[key] = value
     logger.log_hyperparams(logged_hparams)
 
     trainer: Trainer = instantiate(
@@ -82,6 +85,9 @@ def test(
     logged_hparams["batch_size"] = config.batch_size
     logged_hparams["epoch"] = config.epoch
     logged_hparams["seed"] = config.seed
+    for key, value in config.trainer.items():
+        if key != "_target_":
+            logged_hparams[key] = value
     logger.log_hyperparams(logged_hparams)
 
     trainer: Trainer = instantiate(
