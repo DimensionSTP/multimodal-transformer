@@ -9,9 +9,9 @@ from torch.utils.data import DataLoader
 
 from lightning.pytorch import Trainer, seed_everything
 from lightning.pytorch.loggers.wandb import WandbLogger
+from lightning.pytorch.callbacks import EarlyStopping
 
 import optuna
-from optuna.integration import PyTorchLightningPruningCallback
 from optuna.samplers import TPESampler
 from optuna.pruners import HyperbandPruner
 
@@ -34,8 +34,8 @@ class MultiModalTuner:
         self.hparams = hparams
         self.module_params = module_params
         self.num_trials = num_trials
-        self.hparams_save_path = hparams_save_path
         self.seed = seed
+        self.hparams_save_path = hparams_save_path
         self.train_loader = train_loader
         self.val_loader = val_loader
         self.logger = logger
@@ -163,25 +163,30 @@ class MultiModalTuner:
             model=model,
             num_classes=self.module_params.num_classes,
             average=self.module_params.average,
+            strategy=self.module_params.strategy,
             lr=params["lr"],
             t_max=params["t_max"],
             eta_min=params["eta_min"],
             interval=self.module_params.interval,
         )
 
-        pruning_callback = PyTorchLightningPruningCallback(
-            trial, monitor="val_MulticlassF1Score"
-        )
         self.logger.log_hyperparams(params)
+        callbacks = EarlyStopping(
+            monitor=self.module_params.monitor,
+            mode=self.module_params.mode,
+            patience=self.module_params.patience,
+            min_delta=self.module_params.min_delta,
+        )
 
         trainer = Trainer(
-            devices=1,
+            devices=self.module_params.devices,
             accelerator=self.module_params.accelerator,
+            strategy=self.module_params.strategy,
             log_every_n_steps=self.module_params.log_every_n_steps,
             precision=self.module_params.precision,
             max_epochs=self.module_params.max_epochs,
             enable_checkpointing=False,
-            callbacks=pruning_callback,
+            callbacks=callbacks,
             logger=self.logger,
         )
 

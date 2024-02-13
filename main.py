@@ -10,9 +10,13 @@ from src.pipelines.pipeline import train, test, tune
 def main(
     config: DictConfig,
 ) -> None:
-    if config.is_tuned:
+    if config.is_tuned == "tuned":
         params = json.load(open(config.tuned_hparams_path, "rt", encoding="UTF-8"))
         config = OmegaConf.merge(config, params)
+    elif config.is_tuned == "untuned":
+        pass
+    else:
+        raise ValueError(f"Invalid is_tuned argument: {config.is_tuned}")
 
     if config.mode == "train":
         return train(config)

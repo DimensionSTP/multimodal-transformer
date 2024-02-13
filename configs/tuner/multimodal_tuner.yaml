@@ -51,10 +51,16 @@ module_params:
   num_classes: ${num_labels}
   average: macro
   interval: step
-  accelerator: gpu
-  log_every_n_steps: 10
-  precision: 32
+  devices: ${devices}
+  accelerator: ${accelerator}
+  strategy: ${strategy}
+  log_every_n_steps: ${log_every_n_steps}
+  precision: ${precision}
   max_epochs: ${epoch}
+  monitor: ${monitor}
+  mode: ${tracking_direction}
+  patience: ${patience}
+  min_delta: ${min_delta}
 
 num_trials: ${num_trials}
 seed: ${seed}
