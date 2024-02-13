@@ -1,20 +1,20 @@
 model_checkpoint:
   _target_: lightning.pytorch.callbacks.ModelCheckpoint
-  monitor: val_MulticlassF1Score
-  mode: max
-  save_top_k: 3
-  save_last: True
+  monitor: ${monitor}
+  mode: ${tracking_direction}
+  save_top_k: ${patience}
+  save_last: False
   verbose: True
-  dirpath: ${project_dir}/checkpoints/${model_name}/${dataset_name}
+  dirpath: ${connected_dir}/checkpoints/${model_name}/${dataset_name}/${is_tuned}/${strategy}
   filename: ${save_detail}-epoch{epoch}
   auto_insert_metric_name: False
 
 early_stopping:
   _target_: lightning.pytorch.callbacks.EarlyStopping
-  monitor: val_MulticlassF1Score
-  mode: max
-  patience: 3
-  min_delta: 0
+  monitor: ${monitor}
+  mode: ${tracking_direction}
+  patience: ${patience}
+  min_delta: ${min_delta}
 
 model_summary:
   _target_: lightning.pytorch.callbacks.RichModelSummary

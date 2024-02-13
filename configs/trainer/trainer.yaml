@@ -1,7 +1,7 @@
 _target_: lightning.pytorch.Trainer
-devices: -1
-accelerator: gpu
-strategy: ddp
-log_every_n_steps: 10
-precision: 32
+devices: ${devices}
+accelerator: ${accelerator}
+strategy: ${strategy}
+log_every_n_steps: ${log_every_n_steps}
+precision: ${precision}
 max_epochs: ${epoch}
