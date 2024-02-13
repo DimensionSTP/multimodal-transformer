@@ -20,6 +20,7 @@ class KEMDy19Dataset(Dataset):
     def __init__(
         self,
         data_path: str,
+        split: str,
         pretrained_hubert: str,
         pretrained_roberta: str,
         audio_max_length: int,
@@ -31,6 +32,7 @@ class KEMDy19Dataset(Dataset):
     ) -> None:
         super().__init__()
         self.data_path = data_path
+        self.split = split
         self.audio_feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained(
             pretrained_hubert
         )
@@ -189,14 +191,10 @@ class KEMDy19Dataset(Dataset):
         return text
 
     def load_data(self) -> Tuple[List[str], List[str], List[int]]:
-        data = pd.read_pickle(self.data_path)
+        data = pd.read_pickle(f"{self.data_path}/path_data/path_{self.split}.pkl")
         data = data.dropna()
-        split_current_path = self.data_path.split("/")[:3]
-        current_path = (
-            f"{split_current_path[0]}/{split_current_path[1]}/{split_current_path[2]}"
-        )
         audio_path = data["total_path"].values
-        audio_path = [f"{current_path}/{path[2:]}" for path in audio_path]
+        audio_path = [f"{self.data_path}/{path[2:]}" for path in audio_path]
         text = list(data["text"])
         labels = list(data["emotion"])
         return (audio_path, text, labels)

@@ -1,7 +1,8 @@
 _target_: src.datasets.multimodal_dataset.KEMDy19Dataset
-data_path: ${project_dir}/path_data/path_train.pkl
-pretrained_hubert: ${project_dir}/checkpoints/hubert_large/checkpoint-4110
-pretrained_roberta: ${project_dir}/checkpoints/roberta_large/checkpoint-4110
+data_path: ${connected_dir}
+split: ${split}
+pretrained_hubert: ${connected_dir}/checkpoints/hubert_large/checkpoint-4110
+pretrained_roberta: ${connected_dir}/checkpoints/roberta_large/checkpoint-4110
 audio_max_length: 80000
 text_max_length: 249
 num_labels: ${num_labels}
