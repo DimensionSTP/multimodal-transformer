@@ -46,7 +46,7 @@ def pipeline(
     predictions = pred.predictions
     if not os.path.exists(config.save_predictions):
         os.makedirs(config.save_predictions)
-    np.save(f"{config.save_predictions}/{config.modality}.npy", predictions)
+    np.save(f"{config.save_predictions}/{config.mode}.npy", predictions)
     test = pd.read_pickle(config.data_path.test)
     test = test.dropna()
     y_pred = np.argmax(predictions, 1)

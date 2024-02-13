@@ -4,16 +4,18 @@ defaults:
   - training_arguments: training_arguments
   - hydra: hydra
 
-project_dir: /home/ddang/multimodal-transformer
+package_name: multimodal-transformer
+project_dir: /home/ddang/${package_name}
+connected_dir: /data/${package_name}
 
 seed: 2024
 
 num_labels: 7
 
-data_path:
-  train: ${project_dir}/path_data/path_train.pkl
-  val: ${project_dir}/path_data/path_val.pkl
-  test: ${project_dir}/path_data/path_test.pkl
+split:
+  train: train
+  val: val
+  test: test
 
 batch_size: 32
 
@@ -32,13 +34,13 @@ epoch: 5
 
 model_name: UniModalTransformer
 dataset_name: KEMDy19
+mode: audio
 
-project_name: ${model_name}-${dataset_name}
+project_name: ${model_name}-${dataset_name}-${mode}
 save_detail: bs${batch_size}-lr${lr}-epoch${epoch}
 
-modality: audio
-run_name: ${project_name}-${modality}
+run_name: ${project_name}
 work_dir: ${hydra:runtime.cwd}
 
-output_directory: ${project_dir}/checkpoints/${modality}
-save_predictions: ${project_dir}/preds/unimodal
+output_directory: ${connected_dir}/checkpoints/${mode}
+save_predictions: ${connected_dir}/preds/unimodal

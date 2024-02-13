@@ -25,52 +25,55 @@ class SetUp:
 
     def get_train_dataset(self) -> Dataset:
         train_dataset: Dataset = instantiate(
-            self.config.dataset, data_path=self.config.data_path.train
+            self.config.dataset,
+            split=self.config.split.train,
         )
         return train_dataset
 
     def get_val_dataset(self) -> Dataset:
         val_dataset: Dataset = instantiate(
-            self.config.dataset, data_path=self.config.data_path.val
+            self.config.dataset,
+            split=self.config.split.val,
         )
         return val_dataset
 
     def get_test_dataset(self) -> Dataset:
         test_dataset: Dataset = instantiate(
-            self.config.dataset, data_path=self.config.data_path.test
+            self.config.dataset,
+            split=self.config.split.test,
         )
         return test_dataset
 
     def get_tokenizer(self) -> Union[AutoTokenizer, Wav2Vec2FeatureExtractor]:
-        if self.config.modality == "audio":
+        if self.config.mode == "audio":
             tokenizer = Wav2Vec2FeatureExtractor.from_pretrained(
                 pretrained_model_name_or_path=self.config.audio_pretrained_model_name,
             )
-        elif self.config.modality == "text":
+        elif self.config.mode == "text":
             tokenizer = AutoTokenizer.from_pretrained(
                 pretrained_model_name_or_path=self.config.text_pretrained_model_name,
             )
         else:
-            raise Exception("Only text or audio can be training modality")
+            raise Exception("Only text or audio can be training mode")
         return tokenizer
 
     def get_model(
         self,
     ) -> Union[AutoModelForSequenceClassification, HubertForSequenceClassification]:
-        if self.config.modality == "audio":
+        if self.config.mode == "audio":
             model = HubertForSequenceClassification.from_pretrained(
                 pretrained_model_name_or_path=self.config.audio_pretrained_model_name,
                 num_labels=self.config.num_labels,
                 output_hidden_states=self.config.output_hidden_states,
             )
-        elif self.config.modality == "text":
+        elif self.config.mode == "text":
             model = AutoModelForSequenceClassification.from_pretrained(
                 pretrained_model_name_or_path=self.config.text_pretrained_model_name,
                 num_labels=self.config.num_labels,
                 output_hidden_states=self.config.output_hidden_states,
             )
         else:
-            raise Exception("Only text or audio can be training modality")
+            raise Exception("Only text or audio can be training mode")
         return model
 
     def get_metric(self) -> Metric:
