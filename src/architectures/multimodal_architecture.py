@@ -7,6 +7,8 @@ from torchmetrics import MetricCollection, F1Score, Accuracy
 
 from lightning.pytorch import LightningModule
 
+from deepspeed.ops.adam import FusedAdam, DeepSpeedCPUAdam
+
 
 class MultiModalArchitecture(LightningModule):
     def __init__(
@@ -14,6 +16,7 @@ class MultiModalArchitecture(LightningModule):
         model: nn.Module,
         num_classes: int,
         average: str,
+        strategy: str,
         lr: float,
         t_max: int,
         eta_min: float,
@@ -21,6 +24,7 @@ class MultiModalArchitecture(LightningModule):
     ) -> None:
         super().__init__()
         self.model = model
+        self.strategy = strategy
         self.lr = lr
         self.t_max = t_max
         self.eta_min = eta_min
@@ -63,13 +67,21 @@ class MultiModalArchitecture(LightningModule):
         return (loss, pred, label)
 
     def configure_optimizers(self) -> Dict[str, Any]:
-        adam_w_optimizer = optim.AdamW(self.parameters(), lr=self.lr)
-        cosine_scheduler = optim.lr_scheduler.CosineAnnealingLR(
-            adam_w_optimizer, T_max=self.t_max, eta_min=self.eta_min
+        if self.strategy == "deepspeed_stage_3":
+            optimizer = FusedAdam(self.parameters(), lr=self.lr)
+        elif (
+            self.strategy == "deepspeed_stage_2_offload"
+            or self.strategy == "deepspeed_stage_3_offload"
+        ):
+            optimizer = DeepSpeedCPUAdam(self.parameters(), lr=self.lr)
+        else:
+            optimizer = optim.AdamW(self.parameters(), lr=self.lr)
+        scheduler = optim.lr_scheduler.CosineAnnealingLR(
+            optimizer, T_max=self.t_max, eta_min=self.eta_min
         )
         return {
-            "optimizer": adam_w_optimizer,
-            "lr_scheduler": {"scheduler": cosine_scheduler, "interval": self.interval},
+            "optimizer": optimizer,
+            "lr_scheduler": {"scheduler": scheduler, "interval": self.interval},
         }
 
     def training_step(

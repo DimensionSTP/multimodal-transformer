@@ -19,7 +19,8 @@ class SetUp:
 
     def get_train_loader(self) -> DataLoader:
         train_dataset: Dataset = instantiate(
-            self.config.dataset, data_path=self.config.data_path.train
+            self.config.dataset,
+            split=self.config.split.train,
         )
         return DataLoader(
             dataset=train_dataset,
@@ -30,7 +31,8 @@ class SetUp:
 
     def get_val_loader(self) -> DataLoader:
         val_dataset: Dataset = instantiate(
-            self.config.dataset, data_path=self.config.data_path.val
+            self.config.dataset,
+            split=self.config.split.val,
         )
         return DataLoader(
             dataset=val_dataset,
@@ -41,7 +43,8 @@ class SetUp:
 
     def get_test_loader(self) -> DataLoader:
         test_dataset: Dataset = instantiate(
-            self.config.dataset, data_path=self.config.data_path.test
+            self.config.dataset,
+            split=self.config.split.test,
         )
         return DataLoader(
             dataset=test_dataset,
@@ -51,18 +54,23 @@ class SetUp:
         )
 
     def get_architecture(self) -> LightningModule:
-        architecture: LightningModule = instantiate(self.config.architecture)
+        architecture: LightningModule = instantiate(
+            self.config.architecture,
+            strategy=self.config.strategy,
+        )
         return architecture
 
     def get_callbacks(self) -> List[Any]:
         model_checkpotint: ModelCheckpoint = instantiate(
-            self.config.callbacks.model_checkpoint
+            self.config.callbacks.model_checkpoint,
         )
         early_stopping: EarlyStopping = instantiate(
-            self.config.callbacks.early_stopping
+            self.config.callbacks.early_stopping,
         )
         return [model_checkpotint, early_stopping]
 
     def get_wandb_logger(self) -> WandbLogger:
-        wandb_logger: WandbLogger = instantiate(self.config.logger.wandb)
+        wandb_logger: WandbLogger = instantiate(
+            self.config.logger.wandb,
+        )
         return wandb_logger

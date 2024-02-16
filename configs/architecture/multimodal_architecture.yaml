@@ -18,6 +18,7 @@ model:
 
 num_classes: ${num_labels}
 average: macro
+strategy: ${strategy}
 lr: ${lr}
 t_max: ${t_max}
 eta_min: ${eta_min}
