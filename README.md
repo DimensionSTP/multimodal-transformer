@@ -24,33 +24,33 @@ pip install -r requirements.txt
 
 * only audio
 ```shell
-python unimodal_main.py modality=audio dataset=audio_kemdy19_dataset
+python unimodal_main.py mode=audio dataset=audio_kemdy19_dataset
 ```
 
 * only text
 ```shell
-python unimodal_main.py modality=text dataset=text_kemdy19_dataset
+python unimodal_main.py mode=text dataset=text_kemdy19_dataset
 ```
 
 ### Multi Modality Model Hyper-Parameters Tuning
 
 * multimodal transformer(embedding vector deep fusion)
 ```shell
-python main.py mode=tune is_tuned=False
+python main.py mode=tune is_tuned=untuned
 ```
 
 ### Multi Modality Training
 
 * multimodal transformer(embedding vector deep fusion)
 ```shell
-python main.py mode=train is_tuned={bool}
+python main.py mode=train is_tuned={tuned or untuned}
 ```
 
 ### Multi Modality Testing
 
 * multimodal transformer(embedding vector deep fusion)
 ```shell
-python main.py mode=test is_tuned={bool} epoch={ckpt epoch}
+python main.py mode=test is_tuned={tuned or untuned} epoch={ckpt epoch}
 ```
 
 
