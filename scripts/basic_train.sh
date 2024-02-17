@@ -1,1 +1,1 @@
-python train.py batch_size=8
+python main.py mode=train is_tuned=untuned
