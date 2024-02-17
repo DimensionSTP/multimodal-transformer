@@ -1,4 +1,4 @@
 _target_: src.datasets.audio_dataset.KEMDy19Dataset
 data_path: ${connected_dir}
-split: ${split}
+split: ${split.train}
 pretrained_model: ${audio_pretrained_model_name}

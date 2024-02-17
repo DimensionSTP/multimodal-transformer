@@ -1,6 +1,6 @@
 _target_: src.datasets.multimodal_dataset.KEMDy19Dataset
 data_path: ${connected_dir}
-split: ${split}
+split: ${split.train}
 pretrained_hubert: ${connected_dir}/checkpoints/hubert_large/checkpoint-4110
 pretrained_roberta: ${connected_dir}/checkpoints/roberta_large/checkpoint-4110
 audio_max_length: 80000
