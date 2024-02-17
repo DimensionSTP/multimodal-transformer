@@ -61,7 +61,8 @@ tuned_hparams_path: ${hparams_save_path}/best_params.json
 
 project_name: ${model_name}-${dataset_name}-${mode}
 save_detail: d_model${d_model}-n_heads${n_heads}-n_layers${n_layers}-bs${batch_size}
-ckpt_path: ${callbacks.model_checkpoint.dirpath}/${save_detail}-epoch${epoch}.ckpt
+resumed_step: 0
+ckpt_path: ${callbacks.model_checkpoint.dirpath}/epoch${epoch}.ckpt
 
 run_name: ${project_name}
 work_dir: ${hydra:runtime.cwd}
