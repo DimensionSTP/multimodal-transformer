@@ -13,15 +13,18 @@ from fairseq.modules import SinusoidalPositionalEmbedding
 class TransformerBlock(nn.Module):
     def __init__(
         self,
-        d_model: int,
-        n_heads: int,
+        model_dims: int,
+        num_heads: int,
         attn_dropout: float,
         res_dropout: float,
     ) -> None:
         super().__init__()
-        self.layer_norm = nn.LayerNorm(d_model)
+        self.layer_norm = nn.LayerNorm(model_dims)
         self.attn = nn.MultiheadAttention(
-            d_model, n_heads, dropout=attn_dropout, batch_first=True
+            model_dims,
+            num_heads,
+            dropout=attn_dropout,
+            batch_first=True,
         )
         self.dropout = nn.Dropout(res_dropout)
 
@@ -34,9 +37,20 @@ class TransformerBlock(nn.Module):
         attn_mask: bool = True,
     ) -> torch.Tensor:
         query, key, value = [self.layer_norm(x) for x in (query, key, value)]
-        mask = self.get_future_mask(query, key) if attn_mask else None
+        mask = (
+            self.get_future_mask(
+                query,
+                key,
+            )
+            if attn_mask
+            else None
+        )
         x = self.attn(
-            query, key, value, key_padding_mask=key_padding_mask, attn_mask=mask
+            query,
+            key,
+            value,
+            key_padding_mask=key_padding_mask,
+            attn_mask=mask,
         )[0]
         return query + self.dropout(x)
 
@@ -48,25 +62,41 @@ class TransformerBlock(nn.Module):
         seq_len_query = query.shape[1]
         seq_len_key = seq_len_query if key is None else key.shape[1]
 
-        future_mask = torch.ones(seq_len_query, seq_len_key, device=query.device)
-        future_mask = torch.triu(future_mask, diagonal=1).float()
-        future_mask = future_mask.masked_fill(future_mask == float(1), float("-inf"))
+        future_mask = torch.ones(
+            seq_len_query,
+            seq_len_key,
+            device=query.device,
+        )
+        future_mask = torch.triu(
+            future_mask,
+            diagonal=1,
+        ).float()
+        future_mask = future_mask.masked_fill(
+            future_mask == float(1),
+            float("-inf"),
+        )
         return future_mask
 
 
 class FeedForwardBlock(nn.Module):
     def __init__(
         self,
-        d_model: int,
-        d_feed_forward: int,
+        model_dims: int,
+        feed_forward_dims: int,
         relu_dropout: float,
         res_dropout: float,
     ) -> None:
         super().__init__()
-        self.layer_norm = nn.LayerNorm(d_model)
-        self.feed_forward1 = nn.Linear(d_model, d_feed_forward)
+        self.layer_norm = nn.LayerNorm(model_dims)
+        self.feed_forward1 = nn.Linear(
+            model_dims,
+            feed_forward_dims,
+        )
         self.dropout1 = nn.Dropout(relu_dropout)
-        self.feed_forward2 = nn.Linear(d_feed_forward, d_model)
+        self.feed_forward2 = nn.Linear(
+            feed_forward_dims,
+            model_dims,
+        )
         self.dropout2 = nn.Dropout(res_dropout)
 
     def forward(
@@ -84,17 +114,25 @@ class FeedForwardBlock(nn.Module):
 class EncoderBlock(nn.Module):
     def __init__(
         self,
-        d_model: int,
-        n_heads: int,
-        d_feed_forward: int,
+        model_dims: int,
+        num_heads: int,
+        feed_forward_dims: int,
         attn_dropout: float,
         relu_dropout: float,
         res_dropout: float,
     ) -> None:
         super().__init__()
-        self.transformer = TransformerBlock(d_model, n_heads, attn_dropout, res_dropout)
+        self.transformer = TransformerBlock(
+            model_dims,
+            num_heads,
+            attn_dropout,
+            res_dropout,
+        )
         self.feed_forward = FeedForwardBlock(
-            d_model, d_feed_forward, res_dropout, relu_dropout
+            model_dims,
+            feed_forward_dims,
+            res_dropout,
+            relu_dropout,
         )
 
     def forward(
@@ -106,7 +144,11 @@ class EncoderBlock(nn.Module):
     ) -> torch.Tensor:
         if key is not None:
             x = self.transformer(
-                query, key, key, key_padding_mask=key_padding_mask, attn_mask=attn_mask
+                query,
+                key,
+                key,
+                key_padding_mask=key_padding_mask,
+                attn_mask=attn_mask,
             )
         else:
             x = self.transformer(
@@ -123,9 +165,10 @@ class EncoderBlock(nn.Module):
 class CrossModalTransformer(nn.Module):
     def __init__(
         self,
-        d_model: int,
-        n_heads: int,
-        n_layers: int,
+        model_dims: int,
+        num_heads: int,
+        num_layers: int,
+        text_max_length: int,
         attn_dropout: float,
         relu_dropout: float,
         res_dropout: float,
@@ -135,19 +178,26 @@ class CrossModalTransformer(nn.Module):
     ) -> None:
         super().__init__()
         self.attn_mask = attn_mask
-        self.emb_scale = math.sqrt(d_model) if scale_embedding else 1.0
-        self.pos_emb = SinusoidalPositionalEmbedding(d_model, 0, init_size=249)
+        self.emb_scale = math.sqrt(model_dims) if scale_embedding else 1.0
+        self.pos_emb = SinusoidalPositionalEmbedding(
+            model_dims,
+            0,
+            init_size=text_max_length,
+        )
         self.dropout = nn.Dropout(emb_dropout)
 
         layer = EncoderBlock(
-            d_model=d_model,
-            n_heads=n_heads,
-            d_feed_forward=d_model * 4,
+            model_dims=model_dims,
+            num_heads=num_heads,
+            feed_forward_dims=model_dims * 4,
             attn_dropout=attn_dropout,
             relu_dropout=relu_dropout,
             res_dropout=res_dropout,
         )
-        self.layers = self.get_clone(layer, n_layers)
+        self.layers = self.get_clone(
+            layer,
+            num_layers,
+        )
 
     def forward(
         self,
@@ -168,7 +218,10 @@ class CrossModalTransformer(nn.Module):
 
         for layer in self.layers:
             query = layer(
-                query, key, key_padding_mask=key_padding_mask, attn_mask=self.attn_mask
+                query,
+                key,
+                key_padding_mask=key_padding_mask,
+                attn_mask=self.attn_mask,
             )
         return query
 

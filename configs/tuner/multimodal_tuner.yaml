@@ -1,9 +1,9 @@
 _target_: src.tuners.multimodal_tuner.MultiModalTuner
 hparams:
-  n_heads:
+  num_heads:
     - 4
     - 8
-  n_layers:
+  num_layers:
     - 2
     - 3
     - 4
@@ -47,8 +47,9 @@ hparams:
     log: False
 
 module_params:
-  d_model: 1024
-  num_classes: ${num_labels}
+  model_dims: 1024
+  text_max_length: ${text_max_length}
+  num_labels: ${num_labels}
   average: macro
   interval: step
   devices: ${devices}

@@ -2,12 +2,13 @@ _target_: src.architectures.multimodal_architecture.MultiModalArchitecture
 
 model:
   _target_: src.architectures.models.multimodal_transformer.MultiModalTransformer
-  d_model: ${d_model}
-  n_heads: ${n_heads}
-  n_layers: ${n_layers}
-  d_audio: 1024
-  d_text: 1024
-  n_classes: ${num_labels}
+  model_dims: ${model_dims}
+  num_heads: ${num_heads}
+  num_layers: ${num_layers}
+  audio_dims: 1024
+  text_dims: 1024
+  text_max_length: ${text_max_length}
+  num_labels: ${num_labels}
   attn_dropout: ${attn_dropout}
   relu_dropout: ${relu_dropout}
   res_dropout: ${res_dropout}
@@ -16,7 +17,7 @@ model:
   attn_mask: ${attn_mask}
   scale_embedding: ${scale_embedding}
 
-num_classes: ${num_labels}
+num_labels: ${num_labels}
 average: macro
 strategy: ${strategy}
 lr: ${lr}

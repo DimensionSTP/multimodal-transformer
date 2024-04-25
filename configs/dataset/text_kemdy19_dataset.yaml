@@ -2,4 +2,4 @@ _target_: src.datasets.text_dataset.KEMDy19Dataset
 data_path: ${connected_dir}
 split: ${split.train}
 pretrained_model: ${text_pretrained_model_name}
-text_max_length: 249
+text_max_length: ${text_max_length}

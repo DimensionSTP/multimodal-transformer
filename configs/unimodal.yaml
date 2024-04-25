@@ -19,6 +19,8 @@ split:
 
 batch_size: 32
 
+text_max_length: 249
+
 audio_pretrained_model_name: facebook/hubert-large-ls960-ft
 text_pretrained_model_name: klue/roberta-large
 

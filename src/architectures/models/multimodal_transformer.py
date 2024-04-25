@@ -8,30 +8,44 @@ from .crossmodal_transformer import CrossModalTransformer
 class MultiModalTransformer(nn.Module):
     def __init__(
         self,
-        d_model: int = 64,
-        n_heads: int = 8,
-        n_layers: int = 4,
-        d_audio: int = 1024,
-        d_text: int = 1024,
-        n_classes: int = 7,
-        attn_dropout: float = 0.25,
-        relu_dropout: float = 0.0,
-        res_dropout: float = 0.0,
-        emb_dropout: float = 0.3,
-        out_dropout: float = 0.1,
-        attn_mask: bool = True,
-        scale_embedding: bool = True,
+        model_dims: int,
+        num_heads: int,
+        num_layers: int,
+        audio_dims: int,
+        text_dims: int,
+        text_max_length: int,
+        num_labels: int,
+        attn_dropout: float,
+        relu_dropout: float,
+        res_dropout: float,
+        emb_dropout: float,
+        out_dropout: float,
+        attn_mask: bool,
+        scale_embedding: bool,
     ) -> None:
         super().__init__()
-        combined_dim = d_model * 2
+        combined_dim = model_dims * 2
 
-        self.audio_encoder = nn.Conv1d(d_audio, d_model, 3, padding=1, bias=True)
-        self.text_encoder = nn.Conv1d(d_text, d_model, 3, padding=1, bias=True)
+        self.audio_encoder = nn.Conv1d(
+            audio_dims,
+            model_dims,
+            3,
+            padding=1,
+            bias=True,
+        )
+        self.text_encoder = nn.Conv1d(
+            text_dims,
+            model_dims,
+            3,
+            padding=1,
+            bias=True,
+        )
 
         kwargs = {
-            "d_model": d_model,
-            "n_heads": n_heads,
-            "n_layers": n_layers,
+            "model_dims": model_dims,
+            "num_heads": num_heads,
+            "num_layers": num_layers,
+            "text_max_length": text_max_length,
             "attn_dropout": attn_dropout,
             "relu_dropout": relu_dropout,
             "res_dropout": res_dropout,
@@ -45,10 +59,19 @@ class MultiModalTransformer(nn.Module):
         self.audio_self = self.get_network(**kwargs)
         self.text_self = self.get_network(**kwargs)
 
-        self.fc1 = nn.Linear(combined_dim, combined_dim)
-        self.fc2 = nn.Linear(combined_dim, combined_dim)
+        self.fc1 = nn.Linear(
+            combined_dim,
+            combined_dim,
+        )
+        self.fc2 = nn.Linear(
+            combined_dim,
+            combined_dim,
+        )
         self.dropout = nn.Dropout(out_dropout)
-        self.out_layer = nn.Linear(combined_dim, n_classes)
+        self.out_layer = nn.Linear(
+            combined_dim,
+            num_labels,
+        )
 
     def forward(
         self,
@@ -59,11 +82,33 @@ class MultiModalTransformer(nn.Module):
     ) -> torch.Tensor:
         audio = self.audio_encoder(audio.transpose(1, 2)).transpose(1, 2)
         text = self.text_encoder(text.transpose(1, 2)).transpose(1, 2)
-        audio = self.audio_text(query=audio, key=text, key_padding_mask=text_mask)
-        text = self.text_audio(query=text, key=audio, key_padding_mask=audio_mask)
-        audio = self.audio_self(query=audio, key=audio, key_padding_mask=audio_mask)
-        text = self.text_self(query=text, key=text, key_padding_mask=text_mask)
-        features = torch.cat([audio, text], dim=2)
+        audio = self.audio_text(
+            query=audio,
+            key=text,
+            key_padding_mask=text_mask,
+        )
+        text = self.text_audio(
+            query=text,
+            key=audio,
+            key_padding_mask=audio_mask,
+        )
+        audio = self.audio_self(
+            query=audio,
+            key=audio,
+            key_padding_mask=audio_mask,
+        )
+        text = self.text_self(
+            query=text,
+            key=text,
+            key_padding_mask=text_mask,
+        )
+        features = torch.cat(
+            [
+                audio,
+                text,
+            ],
+            dim=2,
+        )
         pooler_output = features[:, 0, :].squeeze()
         out = pooler_output + self.fc2(self.dropout(F.relu(self.fc1(pooler_output))))
 
@@ -72,9 +117,10 @@ class MultiModalTransformer(nn.Module):
     @staticmethod
     def get_network(**kwargs) -> nn.Module:
         return CrossModalTransformer(
-            d_model=kwargs["d_model"],
-            n_heads=kwargs["n_heads"],
-            n_layers=kwargs["n_layers"],
+            model_dims=kwargs["model_dims"],
+            num_heads=kwargs["num_heads"],
+            num_layers=kwargs["num_layers"],
+            text_max_length=kwargs["text_max_length"],
             attn_dropout=kwargs["attn_dropout"],
             relu_dropout=kwargs["relu_dropout"],
             res_dropout=kwargs["res_dropout"],

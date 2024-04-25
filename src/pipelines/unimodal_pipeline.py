@@ -28,8 +28,14 @@ def pipeline(
         eval_pred: Tuple[np.ndarray, np.ndarray],
     ) -> Dict[str, float]:
         predictions, labels = eval_pred
-        predictions = np.argmax(predictions, axis=1)
-        return metric.compute(predictions=predictions, references=labels)
+        predictions = np.argmax(
+            predictions,
+            axis=1,
+        )
+        return metric.compute(
+            predictions=predictions,
+            references=labels,
+        )
 
     trainer = Trainer(
         train_dataset=train_dataset,
@@ -46,7 +52,10 @@ def pipeline(
     predictions = pred.predictions
     if not os.path.exists(config.save_predictions):
         os.makedirs(config.save_predictions)
-    np.save(f"{config.save_predictions}/{config.mode}.npy", predictions)
+    np.save(
+        f"{config.save_predictions}/{config.mode}.npy",
+        predictions,
+    )
     test = pd.read_pickle(config.data_path.test)
     test = test.dropna()
     y_pred = np.argmax(predictions, 1)

@@ -67,15 +67,15 @@ class MultiModalTuner:
 
         params = dict()
         params["seed"] = self.seed
-        if self.hparams.n_heads:
-            params["n_heads"] = trial.suggest_categorical(
-                name="n_heads",
-                choices=self.hparams.n_heads,
+        if self.hparams.num_heads:
+            params["num_heads"] = trial.suggest_categorical(
+                name="num_heads",
+                choices=self.hparams.num_heads,
             )
-        if self.hparams.n_layers:
-            params["n_layers"] = trial.suggest_categorical(
-                name="n_layers",
-                choices=self.hparams.n_layers,
+        if self.hparams.num_layers:
+            params["num_layers"] = trial.suggest_categorical(
+                name="num_layers",
+                choices=self.hparams.num_layers,
             )
         if self.hparams.attn_dropout:
             params["attn_dropout"] = trial.suggest_float(
@@ -145,12 +145,13 @@ class MultiModalTuner:
             )
 
         model = MultiModalTransformer(
-            d_model=self.module_params.d_model,
-            n_heads=params["n_heads"],
-            n_layers=params["n_layers"],
-            d_audio=self.module_params.d_model,
-            d_text=self.module_params.d_model,
-            n_classes=self.module_params.num_classes,
+            model_dims=self.module_params.model_dims,
+            num_heads=params["num_heads"],
+            num_layers=params["num_layers"],
+            audio_dims=self.module_params.model_dims,
+            text_dims=self.module_params.model_dims,
+            text_max_length=self.module_params.text_max_length,
+            num_labels=self.module_params.num_labels,
             attn_dropout=params["attn_dropout"],
             relu_dropout=params["relu_dropout"],
             res_dropout=params["res_dropout"],
@@ -161,7 +162,7 @@ class MultiModalTuner:
         )
         architecture = MultiModalArchitecture(
             model=model,
-            num_classes=self.module_params.num_classes,
+            num_labels=self.module_params.num_labels,
             average=self.module_params.average,
             strategy=self.module_params.strategy,
             lr=params["lr"],

@@ -11,12 +11,19 @@ from transformers import AutoTokenizer
 
 class KEMDy19Dataset(Dataset):
     def __init__(
-        self, data_path: str, split: str, pretrained_model: str, text_max_length: int
+        self,
+        data_path: str,
+        split: str,
+        pretrained_model: str,
+        text_max_length: int,
     ):
         super().__init__()
         self.data_path = data_path
         self.split = split
-        self.text_tokenizer = AutoTokenizer.from_pretrained(pretrained_model)
+        self.text_tokenizer = AutoTokenizer.from_pretrained(
+            pretrained_model,
+            use_fast=True,
+        )
         self.text_max_length = text_max_length
         self.text, self.labels = self.load_data()
 

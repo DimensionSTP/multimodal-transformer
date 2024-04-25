@@ -37,13 +37,18 @@ class KEMDy19Dataset(Dataset):
             pretrained_hubert
         )
         self.text_tokenizer = AutoTokenizer.from_pretrained(
-            pretrained_roberta, use_fast=True
+            pretrained_roberta,
+            use_fast=True,
         )
         self.audio_model = HubertForSequenceClassification.from_pretrained(
-            pretrained_hubert, num_labels=num_labels, output_hidden_states=True
+            pretrained_hubert,
+            num_labels=num_labels,
+            output_hidden_states=True,
         )
         self.text_model = AutoModelForSequenceClassification.from_pretrained(
-            pretrained_roberta, num_labels=num_labels, output_hidden_states=True
+            pretrained_roberta,
+            num_labels=num_labels,
+            output_hidden_states=True,
         )
         self.audio_max_length = audio_max_length
         self.text_max_length = text_max_length
@@ -79,7 +84,9 @@ class KEMDy19Dataset(Dataset):
         attention_mask: torch.Tensor,
     ) -> torch.Tensor:
         output_length = self.get_after_conv_length(
-            attention_mask.sum(-1).to(torch.long)
+            attention_mask.sum(-1).to(
+                torch.long,
+            )
         )
         batch_size = attention_mask.shape[0]
         attention_mask = torch.zeros(
@@ -89,7 +96,10 @@ class KEMDy19Dataset(Dataset):
         )
         attention_mask[
             (
-                torch.arange(attention_mask.shape[0], device=attention_mask.device),
+                torch.arange(
+                    attention_mask.shape[0],
+                    device=attention_mask.device,
+                ),
                 output_length - 1,
             )
         ] = 1
@@ -104,7 +114,11 @@ class KEMDy19Dataset(Dataset):
             return (input_length - kernel_size) // stride + 1
 
         for kernel_size, stride in zip(self.audio_conv_kernel, self.audio_conv_stride):
-            input_length = conv_out_length(input_length, kernel_size, stride)
+            input_length = conv_out_length(
+                input_length,
+                kernel_size,
+                stride,
+            )
 
         return input_length
 
@@ -125,8 +139,7 @@ class KEMDy19Dataset(Dataset):
         self,
         audio: np.ndarray,
     ) -> torch.Tensor:
-        feature_extractor = self.audio_feature_extractor
-        tokenized_audio = feature_extractor(
+        feature_extracted_audio = self.audio_feature_extractor(
             audio,
             sampling_rate=16000,
             max_length=self.audio_max_length,
@@ -134,22 +147,30 @@ class KEMDy19Dataset(Dataset):
             truncation=True,
             return_tensors="pt",
         )
-        return tokenized_audio
+        return feature_extracted_audio
 
     def get_text_padding_mask(
         self,
         attention_mask: torch.Tensor,
     ) -> torch.Tensor:
-        output_length = attention_mask.sum(-1).to(torch.long)
+        output_length = attention_mask.sum(-1).to(
+            torch.long,
+        )
         batch_size = attention_mask.shape[0]
         attention_mask = torch.zeros(
-            (batch_size, self.text_max_length),
+            (
+                batch_size,
+                self.text_max_length,
+            ),
             dtype=attention_mask.dtype,
             device=attention_mask.device,
         )
         attention_mask[
             (
-                torch.arange(attention_mask.shape[0], device=attention_mask.device),
+                torch.arange(
+                    attention_mask.shape[0],
+                    device=attention_mask.device,
+                ),
                 output_length - 1,
             )
         ] = 1

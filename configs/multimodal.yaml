@@ -23,9 +23,11 @@ split:
 
 batch_size: 64
 
-d_model: 1024
-n_heads: 8
-n_layers: 4
+text_max_length: 249
+
+model_dims: 1024
+num_heads: 8
+num_layers: 4
 attn_dropout: .3
 relu_dropout: .3
 res_dropout: .3
@@ -60,7 +62,7 @@ hparams_save_path: ${connected_dir}/hparams/${model_name}/${dataset_name}/${num_
 tuned_hparams_path: ${hparams_save_path}/best_params.json
 
 project_name: ${model_name}-${dataset_name}-${mode}
-save_detail: d_model${d_model}-n_heads${n_heads}-n_layers${n_layers}-bs${batch_size}
+save_detail: model_dims${model_dims}-num_heads${num_heads}-num_layers${num_layers}-bs${batch_size}
 resumed_step: 0
 ckpt_path: ${callbacks.model_checkpoint.dirpath}/epoch${epoch}.ckpt
 

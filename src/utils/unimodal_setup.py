@@ -78,7 +78,8 @@ class SetUp:
 
     def get_metric(self) -> Metric:
         metric = load_metric(
-            self.config.metric.first_metric, self.config.metric.second_metric
+            self.config.metric.first_metric,
+            self.config.metric.second_metric,
         )
         return metric
 
