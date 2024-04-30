@@ -80,11 +80,12 @@ class MultiModalArchitecture(LightningModule):
             output,
             label,
         )
+        logit = output
         pred = torch.argmax(
-            output,
+            logit,
             dim=1,
         )
-        return (loss, pred, label)
+        return (loss, logit, pred, label)
 
     def configure_optimizers(self) -> Dict[str, Any]:
         if self.strategy == "deepspeed_stage_3":
@@ -122,7 +123,7 @@ class MultiModalArchitecture(LightningModule):
         ],
         batch_idx: int,
     ) -> Dict[str, torch.Tensor]:
-        loss, pred, label = self.step(batch)
+        loss, _, pred, label = self.step(batch)
         metrics = self.train_metrics(
             pred,
             label,
@@ -151,7 +152,7 @@ class MultiModalArchitecture(LightningModule):
         ],
         batch_idx: int,
     ) -> Dict[str, torch.Tensor]:
-        loss, pred, label = self.step(batch)
+        loss, _, pred, label = self.step(batch)
         metrics = self.val_metrics(
             pred,
             label,
@@ -180,7 +181,7 @@ class MultiModalArchitecture(LightningModule):
         ],
         batch_idx: int,
     ) -> Dict[str, torch.Tensor]:
-        loss, pred, label = self.step(batch)
+        loss, _, pred, label = self.step(batch)
         metrics = self.test_metrics(
             pred,
             label,
@@ -201,6 +202,17 @@ class MultiModalArchitecture(LightningModule):
             sync_dist=True,
         )
         return {"loss": loss, "pred": pred, "label": label}
+
+    def predict_step(
+        self,
+        batch: Tuple[
+            torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor
+        ],
+        batch_idx: int,
+    ) -> torch.Tensor:
+        _, logit, _, _ = self.step(batch)
+        gathered_logit = self.all_gather(logit)
+        return gathered_logit
 
     def on_train_epoch_end(self) -> None:
         self.train_metrics.reset()
