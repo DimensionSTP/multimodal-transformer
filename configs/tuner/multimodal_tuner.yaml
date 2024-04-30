@@ -57,6 +57,7 @@ module_params:
   strategy: ${strategy}
   log_every_n_steps: ${log_every_n_steps}
   precision: ${precision}
+  accumulate_grad_batches: ${accumulate_grad_batches}
   max_epochs: ${epoch}
   monitor: ${monitor}
   mode: ${tracking_direction}
