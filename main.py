@@ -1,9 +1,14 @@
+import os
+
+os.environ["HYDRA_FULL_ERROR"] = "1"
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
 import json
 
 import hydra
 from omegaconf import OmegaConf, DictConfig
 
-from src.pipelines.pipeline import train, test, tune
+from src.pipelines.pipeline import train, test, predict, tune
 
 
 @hydra.main(
@@ -34,6 +39,8 @@ def main(
         return train(config)
     elif config.mode == "test":
         return test(config)
+    elif config.mode == "predict":
+        return predict(config)
     elif config.mode == "tune":
         return tune(config)
     else:
