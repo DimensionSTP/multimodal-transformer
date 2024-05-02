@@ -1,5 +1,5 @@
-import os
 from typing import Tuple, Dict
+import os
 
 from omegaconf import DictConfig
 
@@ -51,14 +51,20 @@ def pipeline(
     pred = trainer.predict(test_dataset)
     predictions = pred.predictions
     if not os.path.exists(config.save_predictions):
-        os.makedirs(config.save_predictions)
+        os.makedirs(
+            config.save_predictions,
+            exist_ok=True,
+        )
     np.save(
         f"{config.save_predictions}/{config.mode}.npy",
         predictions,
     )
     test = pd.read_pickle(config.data_path.test)
     test = test.dropna()
-    y_pred = np.argmax(predictions, 1)
+    y_pred = np.argmax(
+        predictions,
+        axis=1,
+    )
     test["pred"] = y_pred
     labels = test.emotion.tolist()
     preds = test.pred.tolist()

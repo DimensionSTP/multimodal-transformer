@@ -44,7 +44,7 @@ class SetUp:
         )
         return test_dataset
 
-    def get_tokenizer(self) -> Union[AutoTokenizer, Wav2Vec2FeatureExtractor]:
+    def get_tokenizer(self) -> Union[Wav2Vec2FeatureExtractor, AutoTokenizer]:
         if self.config.mode == "audio":
             tokenizer = Wav2Vec2FeatureExtractor.from_pretrained(
                 pretrained_model_name_or_path=self.config.audio_pretrained_model_name,
@@ -59,7 +59,7 @@ class SetUp:
 
     def get_model(
         self,
-    ) -> Union[AutoModelForSequenceClassification, HubertForSequenceClassification]:
+    ) -> Union[HubertForSequenceClassification, AutoModelForSequenceClassification]:
         if self.config.mode == "audio":
             model = HubertForSequenceClassification.from_pretrained(
                 pretrained_model_name_or_path=self.config.audio_pretrained_model_name,
