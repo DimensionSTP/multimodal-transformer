@@ -77,7 +77,7 @@ class KEMDy19Dataset(Dataset):
         text_hidden = self.get_text_hidden(text_data)
         text_mask = self.get_text_padding_mask(text_data["attention_mask"])
 
-        return (audio_hidden, audio_mask, text_hidden, text_mask, self.labels[idx])
+        return (audio_hidden, audio_mask, text_hidden, text_mask, self.labels[idx], idx)
 
     def get_audio_padding_mask(
         self,
