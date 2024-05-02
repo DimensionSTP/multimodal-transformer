@@ -45,7 +45,12 @@ def train(
         if key != "_target_":
             logged_hparams[key] = value
     for key, value in config.dataset.items():
-        if key not in ["_target_", "data_path", "split", "seed"]:
+        if key not in [
+            "_target_",
+            "data_path",
+            "split",
+            "seed",
+        ]:
             logged_hparams[key] = value
     logger.log_hyperparams(logged_hparams)
 
@@ -131,7 +136,12 @@ def test(
         if key != "_target_":
             logged_hparams[key] = value
     for key, value in config.dataset.items():
-        if key not in ["_target_", "data_path", "split", "seed"]:
+        if key not in [
+            "_target_",
+            "data_path",
+            "split",
+            "seed",
+        ]:
             logged_hparams[key] = value
     logger.log_hyperparams(logged_hparams)
 
@@ -212,16 +222,33 @@ def predict(
         if key != "_target_":
             logged_hparams[key] = value
     for key, value in config.dataset.items():
-        if key not in ["_target_", "data_path", "split", "seed"]:
+        if key not in [
+            "_target_",
+            "data_path",
+            "split",
+            "seed",
+        ]:
             logged_hparams[key] = value
     logger.log_hyperparams(logged_hparams)
 
-    trainer: Trainer = instantiate(
-        config.trainer,
-        callbacks=callbacks,
-        logger=logger,
-        _convert_="partial",
-    )
+    if (
+        config.strategy == "deepspeed_stage_3"
+        or config.strategy == "deepspeed_stage_3_offload"
+    ):
+        trainer: Trainer = instantiate(
+            config.trainer,
+            strategy="ddp",
+            callbacks=callbacks,
+            logger=logger,
+            _convert_="partial",
+        )
+    else:
+        trainer: Trainer = instantiate(
+            config.trainer,
+            callbacks=callbacks,
+            logger=logger,
+            _convert_="partial",
+        )
 
     try:
         if (
@@ -277,7 +304,10 @@ def predict(
         axis=1,
     )
     if not os.path.exists(f"{config.connected_dir}/logits"):
-        os.makedirs(f"{config.connected_dir}/logits")
+        os.makedirs(
+            f"{config.connected_dir}/logits",
+            exist_ok=True,
+        )
     np.save(
         f"{config.connected_dir}/logits/{config.logit_name}.npy",
         sorted_logits,
@@ -287,7 +317,10 @@ def predict(
     )
     pred_df[config.target_column_name] = all_predictions
     if not os.path.exists(f"{config.connected_dir}/submissions"):
-        os.makedirs(f"{config.connected_dir}/submissions")
+        os.makedirs(
+            f"{config.connected_dir}/submissions",
+            exist_ok=True,
+        )
     pred_df.to_csv(
         f"{config.connected_dir}/submissions/{config.submission_name}.csv",
         index=False,
