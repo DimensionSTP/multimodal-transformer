@@ -1,4 +1,4 @@
-from typing import Tuple, Dict, Any
+from typing import Dict, Any
 
 import torch
 from torch import optim, nn
@@ -65,11 +65,14 @@ class MultiModalArchitecture(LightningModule):
 
     def step(
         self,
-        batch: Tuple[
-            torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor
-        ],
-    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        audio, audio_mask, text, text_mask, label, index = batch
+        batch: Dict[str, Any],
+    ) -> Dict[str, torch.Tensor]:
+        audio = batch["audio_hidden"]
+        audio_mask = batch["audio_mask"]
+        text = batch["text_hidden"]
+        text_mask = batch["text_mask"]
+        label = batch["label"]
+        index = batch["index"]
         output = self(
             audio=audio,
             audio_mask=audio_mask,
@@ -87,7 +90,13 @@ class MultiModalArchitecture(LightningModule):
             logit,
             dim=1,
         )
-        return (loss, logit, pred, label, index)
+        return {
+            "loss": loss,
+            "logit": logit,
+            "pred": pred,
+            "label": label,
+            "index": index,
+        }
 
     def configure_optimizers(self) -> Dict[str, Any]:
         if self.strategy == "deepspeed_stage_3":
@@ -109,23 +118,27 @@ class MultiModalArchitecture(LightningModule):
                 lr=self.lr,
             )
         scheduler = optim.lr_scheduler.CosineAnnealingLR(
-            optimizer,
+            optimizer=optimizer,
             T_max=self.t_max,
             eta_min=self.eta_min,
         )
         return {
             "optimizer": optimizer,
-            "lr_scheduler": {"scheduler": scheduler, "interval": self.interval},
+            "lr_scheduler": {
+                "scheduler": scheduler,
+                "interval": self.interval,
+            },
         }
 
     def training_step(
         self,
-        batch: Tuple[
-            torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor
-        ],
+        batch: Dict[str, Any],
         batch_idx: int,
     ) -> Dict[str, torch.Tensor]:
-        loss, _, pred, label, _ = self.step(batch)
+        output = self.step(batch)
+        loss = output["loss"]
+        pred = output["pred"]
+        label = output["label"]
         metrics = self.train_metrics(
             pred,
             label,
@@ -145,16 +158,21 @@ class MultiModalArchitecture(LightningModule):
             prog_bar=True,
             sync_dist=True,
         )
-        return {"loss": loss, "pred": pred, "label": label}
+        return {
+            "loss": loss,
+            "pred": pred,
+            "label": label,
+        }
 
     def validation_step(
         self,
-        batch: Tuple[
-            torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor
-        ],
+        batch: Dict[str, Any],
         batch_idx: int,
     ) -> Dict[str, torch.Tensor]:
-        loss, _, pred, label, _ = self.step(batch)
+        output = self.step(batch)
+        loss = output["loss"]
+        pred = output["pred"]
+        label = output["label"]
         metrics = self.val_metrics(
             pred,
             label,
@@ -174,16 +192,21 @@ class MultiModalArchitecture(LightningModule):
             prog_bar=True,
             sync_dist=True,
         )
-        return {"loss": loss, "pred": pred, "label": label}
+        return {
+            "loss": loss,
+            "pred": pred,
+            "label": label,
+        }
 
     def test_step(
         self,
-        batch: Tuple[
-            torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor
-        ],
+        batch: Dict[str, Any],
         batch_idx: int,
     ) -> Dict[str, torch.Tensor]:
-        loss, _, pred, label, _ = self.step(batch)
+        output = self.step(batch)
+        loss = output["loss"]
+        pred = output["pred"]
+        label = output["label"]
         metrics = self.test_metrics(
             pred,
             label,
@@ -203,18 +226,28 @@ class MultiModalArchitecture(LightningModule):
             prog_bar=True,
             sync_dist=True,
         )
-        return {"loss": loss, "pred": pred, "label": label}
+        return {
+            "loss": loss,
+            "pred": pred,
+            "label": label,
+        }
 
     def predict_step(
         self,
-        batch: Tuple[
-            torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor
-        ],
+        batch: Dict[str, Any],
         batch_idx: int,
     ) -> torch.Tensor:
-        _, logit, _, _, index = self.step(batch)
+        output = self.step(batch)
+        logit = output["logit"]
+        index = output["index"]
         index = index.unsqueeze(-1).float()
-        output = torch.cat((logit, index), dim=-1)
+        output = torch.cat(
+            (
+                logit,
+                index,
+            ),
+            dim=-1,
+        )
         gathered_output = self.all_gather(output)
         return gathered_output
 
