@@ -1,5 +1,5 @@
+from typing import Dict, Any, List
 import re
-from typing import Tuple, Dict, List, Any
 
 import pandas as pd
 
@@ -16,7 +16,7 @@ class KEMDy19Dataset(Dataset):
         split: str,
         pretrained_model: str,
         text_max_length: int,
-    ):
+    ) -> None:
         super().__init__()
         self.data_path = data_path
         self.split = split
@@ -25,7 +25,9 @@ class KEMDy19Dataset(Dataset):
             use_fast=True,
         )
         self.text_max_length = text_max_length
-        self.text, self.labels = self.load_data()
+        dataset = self.get_dataset()
+        self.texts = dataset["texts"]
+        self.labels = dataset["labels"]
 
     def __len__(self) -> int:
         return len(self.labels)
@@ -34,16 +36,42 @@ class KEMDy19Dataset(Dataset):
         self,
         idx: int,
     ) -> Dict[str, Any]:
-        normalized_text = self.normalize_string(self.text[idx])
+        normalized_text = self.normalize_string(self.texts[idx])
         text_input = self.tokenize_text(normalized_text)
         text_data = {k: torch.tensor(v).squeeze() for k, v in text_input.items()}
         text_data["labels"] = torch.tensor(self.labels[idx])
         return text_data
 
+    def get_dataset(self) -> Dict[str, List[Any]]:
+        data = pd.read_pickle(f"{self.data_path}/path_data/path_{self.split}.pkl")
+        data = data.dropna()
+        texts = list(data["text"])
+        labels = list(data["emotion"])
+        return {
+            "texts": texts,
+            "labels": labels,
+        }
+
+    @staticmethod
+    def normalize_string(
+        text: str,
+    ) -> str:
+        text = re.sub(
+            r"[\s]",
+            r" ",
+            str(text),
+        )
+        text = re.sub(
+            r"[^a-zA-Z가-힣ㄱ-ㅎ0-9.!?]+",
+            r" ",
+            str(text),
+        )
+        return text
+
     def tokenize_text(
         self,
         text: str,
-    ) -> torch.Tensor:
+    ) -> Dict[str, torch.Tensor]:
         tokenized_text = self.text_tokenizer(
             text,
             max_length=self.text_max_length,
@@ -52,18 +80,3 @@ class KEMDy19Dataset(Dataset):
             return_tensors="pt",
         )
         return tokenized_text
-
-    @staticmethod
-    def normalize_string(
-        text: str,
-    ) -> str:
-        text = re.sub(r"[\s]", r" ", str(text))
-        text = re.sub(r"[^a-zA-Z가-힣ㄱ-ㅎ0-9.!?]+", r" ", str(text))
-        return text
-
-    def load_data(self) -> Tuple[List[str], List[int]]:
-        data = pd.read_pickle(f"{self.data_path}/path_data/path_{self.split}.pkl")
-        data = data.dropna()
-        text = list(data["text"])
-        labels = list(data["emotion"])
-        return (text, labels)

@@ -1,4 +1,4 @@
-from typing import Tuple, Dict, List, Any
+from typing import Dict, Any, List
 
 import numpy as np
 import pandas as pd
@@ -21,9 +21,11 @@ class KEMDy19Dataset(Dataset):
         self.data_path = data_path
         self.split = split
         self.feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained(
-            pretrained_model
+            pretrained_model,
         )
-        self.audio_path, self.labels = self.load_data()
+        dataset = self.get_dataset()
+        self.audio_paths = dataset["audio_paths"]
+        self.labels = dataset["labels"]
 
     def __len__(self) -> int:
         return len(self.labels)
@@ -32,16 +34,34 @@ class KEMDy19Dataset(Dataset):
         self,
         idx: int,
     ) -> Dict[str, Any]:
-        audio = librosa.load(self.audio_path[idx], sr=16000)[0]
+        audio = librosa.load(
+            self.audio_paths[idx],
+            sr=16000,
+        )[0]
         audio_input = self.feature_extract_audio(audio)
-        item = {key: torch.tensor(val).squeeze() for key, val in audio_input.items()}
-        item["labels"] = torch.tensor(self.labels[idx])
-        return item
+        audio_data = {
+            key: torch.tensor(val).squeeze() for key, val in audio_input.items()
+        }
+        audio_data["labels"] = torch.tensor(self.labels[idx])
+        return audio_data
+
+    def get_dataset(self) -> Dict[str, List[Any]]:
+        data = pd.read_pickle(f"{self.data_path}/path_data/path_{self.split}.pkl")
+        data = data.dropna()
+        audio_paths = data["total_path"].values
+        audio_paths = [
+            f"{self.data_path}/{audio_path[2:]}" for audio_path in audio_paths
+        ]
+        labels = list(data["emotion"])
+        return {
+            "audio_paths": audio_paths,
+            "labels": labels,
+        }
 
     def feature_extract_audio(
         self,
         audio: np.ndarray,
-    ) -> torch.Tensor:
+    ) -> Dict[str, torch.Tensor]:
         feature_extractor = self.feature_extractor
         input = feature_extractor(
             audio,
@@ -52,11 +72,3 @@ class KEMDy19Dataset(Dataset):
             return_tensors="pt",
         )
         return input
-
-    def load_data(self) -> Tuple[List[str], List[int]]:
-        data = pd.read_pickle(f"{self.data_path}/path_data/path_{self.split}.pkl")
-        data = data.dropna()
-        audio_path = data["total_path"].values
-        audio_path = [f"{self.data_path}/{path[2:]}" for path in audio_path]
-        labels = list(data["emotion"])
-        return (audio_path, labels)

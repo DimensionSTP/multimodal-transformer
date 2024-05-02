@@ -1,5 +1,5 @@
+from typing import Dict, Any, List
 import re
-from typing import List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -34,7 +34,7 @@ class KEMDy19Dataset(Dataset):
         self.data_path = data_path
         self.split = split
         self.audio_feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained(
-            pretrained_hubert
+            pretrained_hubert,
         )
         self.text_tokenizer = AutoTokenizer.from_pretrained(
             pretrained_roberta,
@@ -55,7 +55,10 @@ class KEMDy19Dataset(Dataset):
         self.audio_conv_kernel = audio_conv_kernel
         self.audio_conv_stride = audio_conv_stride
         self.device = device
-        self.audio_path, self.text, self.labels = self.load_data()
+        dataset = self.get_dataset()
+        self.audio_paths = dataset["audio_paths"]
+        self.texts = dataset["texts"]
+        self.labels = dataset["labels"]
 
     def __len__(self) -> int:
         return len(self.labels)
@@ -63,21 +66,92 @@ class KEMDy19Dataset(Dataset):
     def __getitem__(
         self,
         idx: int,
-    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, int]:
-        audio = librosa.load(self.audio_path[idx], sr=16000)[0]
+    ) -> Dict[str, Any]:
+        audio = librosa.load(
+            self.audio_paths[idx],
+            sr=16000,
+        )[0]
         audio_input = self.feature_extract_audio(audio)
         audio_data = {k: torch.tensor(v) for k, v in audio_input.items()}
         audio_data["labels"] = torch.tensor(self.labels[idx])
         audio_hidden = self.get_audio_hidden(audio_data)
         audio_mask = self.get_audio_padding_mask(audio_data["attention_mask"])
 
-        normalized_text = self.normalize_string(self.text[idx])
+        normalized_text = self.normalize_string(self.texts[idx])
         text_input = self.tokenize_text(normalized_text)
         text_data = {k: torch.tensor(v) for k, v in text_input.items()}
         text_hidden = self.get_text_hidden(text_data)
         text_mask = self.get_text_padding_mask(text_data["attention_mask"])
 
-        return (audio_hidden, audio_mask, text_hidden, text_mask, self.labels[idx], idx)
+        return {
+            "audio_hidden": audio_hidden,
+            "audio_mask": audio_mask,
+            "text_hidden": text_hidden,
+            "text_mask": text_mask,
+            "label": self.labels[idx],
+            "index": idx,
+        }
+
+    def get_dataset(self) -> Dict[str, List[Any]]:
+        data = pd.read_pickle(f"{self.data_path}/path_data/path_{self.split}.pkl")
+        data = data.dropna()
+        audio_paths = data["total_path"].values
+        audio_paths = [
+            f"{self.data_path}/{audio_path[2:]}" for audio_path in audio_paths
+        ]
+        texts = list(data["text"])
+        labels = list(data["emotion"])
+        return {
+            "audio_paths": audio_paths,
+            "texts": texts,
+            "labels": labels,
+        }
+
+    def feature_extract_audio(
+        self,
+        audio: np.ndarray,
+    ) -> Dict[str, torch.Tensor]:
+        feature_extracted_audio = self.audio_feature_extractor(
+            audio,
+            sampling_rate=16000,
+            max_length=self.audio_max_length,
+            padding="max_length",
+            truncation=True,
+            return_tensors="pt",
+        )
+        return feature_extracted_audio
+
+    def get_audio_hidden(
+        self,
+        audio_data: torch.Tensor,
+    ) -> torch.Tensor:
+        audio_model = self.audio_model.to(self.device)
+        audio_model.eval()
+        with torch.no_grad():
+            input = {k: v.to(self.device) for k, v in audio_data.items()}
+            output = audio_model(**input)
+            hidden = output.hidden_states[0].to("cpu")
+            torch.cuda.empty_cache()
+        return hidden.squeeze()
+
+    def get_after_conv_length(
+        self,
+        input_length: int,
+    ) -> int:
+        def conv_out_length(
+            input_length: int,
+            kernel_size: int,
+            stride: int,
+        ) -> int:
+            return (input_length - kernel_size) // stride + 1
+
+        for kernel_size, stride in zip(self.audio_conv_kernel, self.audio_conv_stride):
+            input_length = conv_out_length(
+                input_length,
+                kernel_size,
+                stride,
+            )
+        return input_length
 
     def get_audio_padding_mask(
         self,
@@ -106,48 +180,47 @@ class KEMDy19Dataset(Dataset):
         attention_mask = attention_mask.cumsum(-1).bool()
         return attention_mask.squeeze()
 
-    def get_after_conv_length(
+    @staticmethod
+    def normalize_string(
+        text: str,
+    ) -> str:
+        text = re.sub(
+            r"[\s]",
+            r" ",
+            str(text),
+        )
+        text = re.sub(
+            r"[^a-zA-Z가-힣ㄱ-ㅎ0-9.!?]+",
+            r" ",
+            str(text),
+        )
+        return text
+
+    def tokenize_text(
         self,
-        input_length: int,
-    ) -> int:
-        def conv_out_length(input_length: int, kernel_size: int, stride: int) -> int:
-            return (input_length - kernel_size) // stride + 1
-
-        for kernel_size, stride in zip(self.audio_conv_kernel, self.audio_conv_stride):
-            input_length = conv_out_length(
-                input_length,
-                kernel_size,
-                stride,
-            )
-
-        return input_length
-
-    def get_audio_hidden(
-        self,
-        audio_data: torch.Tensor,
-    ) -> torch.Tensor:
-        audio_model = self.audio_model.to(self.device)
-        audio_model.eval()
-        with torch.no_grad():
-            input = {k: v.to(self.device) for k, v in audio_data.items()}
-            output = audio_model(**input)
-            hidden = output.hidden_states[0].to("cpu")
-            torch.cuda.empty_cache()
-        return hidden.squeeze()
-
-    def feature_extract_audio(
-        self,
-        audio: np.ndarray,
-    ) -> torch.Tensor:
-        feature_extracted_audio = self.audio_feature_extractor(
-            audio,
-            sampling_rate=16000,
-            max_length=self.audio_max_length,
+        text: str,
+    ) -> Dict[str, torch.Tensor]:
+        tokenized_text = self.text_tokenizer(
+            text,
+            max_length=self.text_max_length,
             padding="max_length",
             truncation=True,
             return_tensors="pt",
         )
-        return feature_extracted_audio
+        return tokenized_text
+
+    def get_text_hidden(
+        self,
+        text_data: torch.Tensor,
+    ) -> torch.Tensor:
+        text_model = self.text_model.to(self.device)
+        text_model.eval()
+        with torch.no_grad():
+            input = {k: v.to(self.device) for k, v in text_data.items()}
+            output = text_model(**input)
+            hidden = output.hidden_states[0].to("cpu")
+            torch.cuda.empty_cache()
+        return hidden.squeeze()
 
     def get_text_padding_mask(
         self,
@@ -176,46 +249,3 @@ class KEMDy19Dataset(Dataset):
         ] = 1
         attention_mask = attention_mask.cumsum(-1).bool()
         return attention_mask.squeeze()
-
-    def get_text_hidden(
-        self,
-        text_data: torch.Tensor,
-    ) -> torch.Tensor:
-        text_model = self.text_model.to(self.device)
-        text_model.eval()
-        with torch.no_grad():
-            input = {k: v.to(self.device) for k, v in text_data.items()}
-            output = text_model(**input)
-            hidden = output.hidden_states[0].to("cpu")
-            torch.cuda.empty_cache()
-        return hidden.squeeze()
-
-    def tokenize_text(
-        self,
-        text: str,
-    ) -> torch.Tensor:
-        tokenized_text = self.text_tokenizer(
-            text,
-            max_length=self.text_max_length,
-            padding="max_length",
-            truncation=True,
-            return_tensors="pt",
-        )
-        return tokenized_text
-
-    @staticmethod
-    def normalize_string(
-        text: str,
-    ) -> str:
-        text = re.sub(r"[\s]", r" ", str(text))
-        text = re.sub(r"[^a-zA-Z가-힣ㄱ-ㅎ0-9.!?]+", r" ", str(text))
-        return text
-
-    def load_data(self) -> Tuple[List[str], List[str], List[int]]:
-        data = pd.read_pickle(f"{self.data_path}/path_data/path_{self.split}.pkl")
-        data = data.dropna()
-        audio_path = data["total_path"].values
-        audio_path = [f"{self.data_path}/{path[2:]}" for path in audio_path]
-        text = list(data["text"])
-        labels = list(data["emotion"])
-        return (audio_path, text, labels)
