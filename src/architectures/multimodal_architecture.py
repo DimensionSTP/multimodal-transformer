@@ -69,7 +69,7 @@ class MultiModalArchitecture(LightningModule):
             torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor
         ],
     ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        audio, audio_mask, text, text_mask, label = batch
+        audio, audio_mask, text, text_mask, label, index = batch
         output = self(
             audio=audio,
             audio_mask=audio_mask,
@@ -87,7 +87,7 @@ class MultiModalArchitecture(LightningModule):
             logit,
             dim=1,
         )
-        return (loss, logit, pred, label)
+        return (loss, logit, pred, label, index)
 
     def configure_optimizers(self) -> Dict[str, Any]:
         if self.strategy == "deepspeed_stage_3":
@@ -125,7 +125,7 @@ class MultiModalArchitecture(LightningModule):
         ],
         batch_idx: int,
     ) -> Dict[str, torch.Tensor]:
-        loss, _, pred, label = self.step(batch)
+        loss, _, pred, label, _ = self.step(batch)
         metrics = self.train_metrics(
             pred,
             label,
@@ -154,7 +154,7 @@ class MultiModalArchitecture(LightningModule):
         ],
         batch_idx: int,
     ) -> Dict[str, torch.Tensor]:
-        loss, _, pred, label = self.step(batch)
+        loss, _, pred, label, _ = self.step(batch)
         metrics = self.val_metrics(
             pred,
             label,
@@ -183,7 +183,7 @@ class MultiModalArchitecture(LightningModule):
         ],
         batch_idx: int,
     ) -> Dict[str, torch.Tensor]:
-        loss, _, pred, label = self.step(batch)
+        loss, _, pred, label, _ = self.step(batch)
         metrics = self.test_metrics(
             pred,
             label,
@@ -212,9 +212,11 @@ class MultiModalArchitecture(LightningModule):
         ],
         batch_idx: int,
     ) -> torch.Tensor:
-        _, logit, _, _ = self.step(batch)
-        gathered_logit = self.all_gather(logit)
-        return gathered_logit
+        _, logit, _, _, index = self.step(batch)
+        index = index.unsqueeze(-1).float()
+        output = torch.cat((logit, index), dim=-1)
+        gathered_output = self.all_gather(output)
+        return gathered_output
 
     def on_train_epoch_end(self) -> None:
         self.train_metrics.reset()
