@@ -80,6 +80,10 @@ class MultiModalTransformer(nn.Module):
         text: torch.Tensor,
         text_mask: torch.Tensor,
     ) -> torch.Tensor:
+        if audio.dim() <= 2:
+            audio = audio.unsqueeze(0)
+        if text.dim() <= 2:
+            text = text.unsqueeze(0)
         audio = self.audio_encoder(audio.transpose(1, 2)).transpose(1, 2)
         text = self.text_encoder(text.transpose(1, 2)).transpose(1, 2)
         audio = self.audio_text(
@@ -111,7 +115,8 @@ class MultiModalTransformer(nn.Module):
         )
         pooler_output = features[:, 0, :].squeeze()
         out = pooler_output + self.fc2(self.dropout(F.relu(self.fc1(pooler_output))))
-
+        if out.dim() == 1:
+            out = out.unsqueeze(0)
         return self.out_layer(out)
 
     @staticmethod

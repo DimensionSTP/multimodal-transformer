@@ -81,6 +81,8 @@ class MultiModalArchitecture(LightningModule):
             label,
         )
         logit = output
+        if logit.dim() == 1:
+            logit = logit.unsqueeze(0)
         pred = torch.argmax(
             logit,
             dim=1,
