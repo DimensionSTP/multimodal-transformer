@@ -280,8 +280,10 @@ def predict(
         f"{config.connected_dir}/logits/{config.logit_name}.npy",
         all_logits,
     )
-    pred_df = pd.read_csv(f"{config.connected_dir}/data/test.csv")
-    pred_df["target"] = all_predictions
+    pred_df = pd.read_csv(
+        f"{config.connected_dir}/data/{config.submission_file_name}.csv"
+    )
+    pred_df[config.target_column_name] = all_predictions
     if not os.path.exists(f"{config.connected_dir}/submissions"):
         os.makedirs(f"{config.connected_dir}/submissions")
     pred_df.to_csv(

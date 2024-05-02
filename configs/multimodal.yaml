@@ -67,6 +67,8 @@ save_detail: model_dims${model_dims}-num_heads${num_heads}-num_layers${num_layer
 resumed_step: 0
 ckpt_path: ${callbacks.model_checkpoint.dirpath}/epoch${epoch}.ckpt
 
+submission_file_name: test
+target_column_name: target
 logit_name: ${save_detail}-epoch${epoch}
 submission_name: ${save_detail}-epoch${epoch}
 
