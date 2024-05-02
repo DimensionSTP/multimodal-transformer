@@ -1,6 +1,6 @@
+from typing import Optional
 import math
 import copy
-from typing import Optional
 
 import torch
 import torch.nn as nn
@@ -21,8 +21,8 @@ class TransformerBlock(nn.Module):
         super().__init__()
         self.layer_norm = nn.LayerNorm(model_dims)
         self.attn = nn.MultiheadAttention(
-            model_dims,
-            num_heads,
+            embed_dim=model_dims,
+            num_heads=num_heads,
             dropout=attn_dropout,
             batch_first=True,
         )
@@ -33,22 +33,22 @@ class TransformerBlock(nn.Module):
         query: torch.Tensor,
         key: torch.Tensor,
         value: torch.Tensor,
-        key_padding_mask: Optional[torch.Tensor] = None,
-        attn_mask: bool = True,
+        key_padding_mask: Optional[torch.Tensor],
+        attn_mask: bool,
     ) -> torch.Tensor:
         query, key, value = [self.layer_norm(x) for x in (query, key, value)]
         mask = (
             self.get_future_mask(
-                query,
-                key,
+                query=query,
+                key=key,
             )
             if attn_mask
             else None
         )
         x = self.attn(
-            query,
-            key,
-            value,
+            query=query,
+            key=key,
+            value=value,
             key_padding_mask=key_padding_mask,
             attn_mask=mask,
         )[0]
@@ -57,7 +57,7 @@ class TransformerBlock(nn.Module):
     def get_future_mask(
         self,
         query: torch.Tensor,
-        key: Optional[torch.Tensor] = None,
+        key: Optional[torch.Tensor],
     ) -> torch.Tensor:
         seq_len_query = query.shape[1]
         seq_len_key = seq_len_query if key is None else key.shape[1]
@@ -65,7 +65,6 @@ class TransformerBlock(nn.Module):
         future_mask = torch.ones(
             seq_len_query,
             seq_len_key,
-            device=query.device,
         )
         future_mask = torch.triu(
             future_mask,
@@ -123,38 +122,38 @@ class EncoderBlock(nn.Module):
     ) -> None:
         super().__init__()
         self.transformer = TransformerBlock(
-            model_dims,
-            num_heads,
-            attn_dropout,
-            res_dropout,
+            model_dims=model_dims,
+            num_heads=num_heads,
+            attn_dropout=attn_dropout,
+            res_dropout=res_dropout,
         )
         self.feed_forward = FeedForwardBlock(
-            model_dims,
-            feed_forward_dims,
-            res_dropout,
-            relu_dropout,
+            model_dims=model_dims,
+            feed_forward_dims=feed_forward_dims,
+            res_dropout=res_dropout,
+            relu_dropout=relu_dropout,
         )
 
     def forward(
         self,
         query: torch.Tensor,
         key: torch.Tensor,
-        key_padding_mask: Optional[torch.Tensor] = None,
-        attn_mask: bool = True,
+        key_padding_mask: Optional[torch.Tensor],
+        attn_mask: bool,
     ) -> torch.Tensor:
         if key is not None:
             x = self.transformer(
-                query,
-                key,
-                key,
+                query=query,
+                key=key,
+                value=key,
                 key_padding_mask=key_padding_mask,
                 attn_mask=attn_mask,
             )
         else:
             x = self.transformer(
-                query,
-                query,
-                query,
+                query=query,
+                key=query,
+                value=query,
                 key_padding_mask=key_padding_mask,
                 attn_mask=attn_mask,
             )
@@ -180,8 +179,8 @@ class CrossModalTransformer(nn.Module):
         self.attn_mask = attn_mask
         self.emb_scale = math.sqrt(model_dims) if scale_embedding else 1.0
         self.pos_emb = SinusoidalPositionalEmbedding(
-            model_dims,
-            0,
+            embedding_dim=model_dims,
+            padding_idx=0,
             init_size=text_max_length,
         )
         self.dropout = nn.Dropout(emb_dropout)
@@ -195,15 +194,15 @@ class CrossModalTransformer(nn.Module):
             res_dropout=res_dropout,
         )
         self.layers = self.get_clone(
-            layer,
-            num_layers,
+            module=layer,
+            iteration=num_layers,
         )
 
     def forward(
         self,
         query: torch.Tensor,
         key: torch.Tensor,
-        key_padding_mask: Optional[torch.Tensor] = None,
+        key_padding_mask: Optional[torch.Tensor],
     ) -> torch.Tensor:
         # query settings
         pos_query = self.pos_emb(query[:, :, 0])
@@ -218,8 +217,8 @@ class CrossModalTransformer(nn.Module):
 
         for layer in self.layers:
             query = layer(
-                query,
-                key,
+                query=query,
+                key=key,
                 key_padding_mask=key_padding_mask,
                 attn_mask=self.attn_mask,
             )
