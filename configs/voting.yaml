@@ -7,7 +7,7 @@ work_dir: ${hydra:runtime.cwd}
 basic_path: /data/multimodal-transformer
 
 submission_file: ${basic_path}/data/test.csv
-target_column_name: target
+target_column_name: emotion
 voting_file: ${basic_path}/submissions/soft_voting.csv
 
 votings:
