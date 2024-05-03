@@ -14,12 +14,14 @@ class KEMDy19Dataset(Dataset):
         self,
         data_path: str,
         split: str,
+        target_column_name: str,
         pretrained_model: str,
         text_max_length: int,
     ) -> None:
         super().__init__()
         self.data_path = data_path
         self.split = split
+        self.target_column_name = target_column_name
         self.text_tokenizer = AutoTokenizer.from_pretrained(
             pretrained_model,
             use_fast=True,
@@ -46,7 +48,7 @@ class KEMDy19Dataset(Dataset):
         data = pd.read_pickle(f"{self.data_path}/path_data/path_{self.split}.pkl")
         data = data.dropna()
         texts = list(data["text"])
-        labels = list(data["emotion"])
+        labels = list(data[self.target_column_name])
         return {
             "texts": texts,
             "labels": labels,

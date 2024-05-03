@@ -21,6 +21,7 @@ class KEMDy19Dataset(Dataset):
         self,
         data_path: str,
         split: str,
+        target_column_name: str,
         pretrained_hubert: str,
         pretrained_roberta: str,
         audio_max_length: int,
@@ -33,6 +34,7 @@ class KEMDy19Dataset(Dataset):
         super().__init__()
         self.data_path = data_path
         self.split = split
+        self.target_column_name = target_column_name
         self.audio_feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained(
             pretrained_hubert,
         )
@@ -100,7 +102,7 @@ class KEMDy19Dataset(Dataset):
             f"{self.data_path}/{audio_path[2:]}" for audio_path in audio_paths
         ]
         texts = list(data["text"])
-        labels = list(data["emotion"])
+        labels = list(data[self.target_column_name])
         return {
             "audio_paths": audio_paths,
             "texts": texts,
