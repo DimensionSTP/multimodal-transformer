@@ -1,0 +1,15 @@
+defaults:
+  - hydra: hydra
+
+run_name: soft_voting
+work_dir: ${hydra:runtime.cwd}
+
+basic_path: /data/multimodal-transformer
+
+submission_file: ${basic_path}/data/test.csv
+target_column_name: target
+voting_file: ${basic_path}/submissions/soft_voting.csv
+
+votings:
+  logit1: 0.5
+  logit2: 0.5
