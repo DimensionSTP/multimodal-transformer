@@ -36,21 +36,28 @@ python unimodal_main.py mode=text dataset=text_kemdy19_dataset
 
 * multimodal transformer(embedding vector deep fusion)
 ```shell
-python main.py mode=tune is_tuned=untuned
+python main.py mode=tune is_tuned=untuned num_trials={num_trials}
 ```
 
 ### Multi Modality Training
 
 * multimodal transformer(embedding vector deep fusion)
 ```shell
-python main.py mode=train is_tuned={tuned or untuned}
+python main.py mode=train is_tuned={tuned or untuned} num_trials={num_trials}
 ```
 
 ### Multi Modality Testing
 
 * multimodal transformer(embedding vector deep fusion)
 ```shell
-python main.py mode=test is_tuned={tuned or untuned} epoch={ckpt epoch}
+python main.py mode=test is_tuned={tuned or untuned} num_trials={num_trials} epoch={ckpt epoch}
+```
+
+### Multi Modality Prediction
+
+* end-to-end
+```shell
+python main.py mode=predict is_tuned={tuned or untuned} num_trials={num_trials} epoch={ckpt epoch}
 ```
 
 
