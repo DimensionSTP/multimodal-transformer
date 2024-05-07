@@ -298,7 +298,10 @@ def predict(
         dim=0,
     )
     sorted_logits_with_indices = all_logits[all_logits[:, -1].argsort()]
-    sorted_logits = sorted_logits_with_indices[:, :-1].numpy()
+    pred_df = pd.read_csv(
+        f"{config.connected_dir}/data/{config.submission_file_name}.csv"
+    )
+    sorted_logits = sorted_logits_with_indices[: len(pred_df), :-1].numpy()
     all_predictions = np.argmax(
         sorted_logits,
         axis=1,
@@ -311,9 +314,6 @@ def predict(
     np.save(
         f"{config.connected_dir}/logits/{config.logit_name}.npy",
         sorted_logits,
-    )
-    pred_df = pd.read_csv(
-        f"{config.connected_dir}/data/{config.submission_file_name}.csv"
     )
     pred_df[config.target_column_name] = all_predictions
     if not os.path.exists(f"{config.connected_dir}/submissions"):

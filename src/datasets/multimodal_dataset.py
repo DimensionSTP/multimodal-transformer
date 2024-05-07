@@ -22,6 +22,8 @@ class KEMDy19Dataset(Dataset):
         data_path: str,
         split: str,
         target_column_name: str,
+        num_devices: int,
+        batch_size: int,
         pretrained_hubert: str,
         pretrained_roberta: str,
         audio_max_length: int,
@@ -35,6 +37,8 @@ class KEMDy19Dataset(Dataset):
         self.data_path = data_path
         self.split = split
         self.target_column_name = target_column_name
+        self.num_devices = num_devices
+        self.batch_size = batch_size
         self.audio_feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained(
             pretrained_hubert,
         )
@@ -97,6 +101,24 @@ class KEMDy19Dataset(Dataset):
     def get_dataset(self) -> Dict[str, List[Any]]:
         if self.split == "predict":
             data = pd.read_pickle(f"{self.data_path}/path_data/path_test.pkl")
+            if self.num_devices > 1:
+                last_row = data.iloc[-1]
+                total_batch_size = self.num_devices * self.batch_size
+                remainder = (len(data) % total_batch_size) % self.num_devices
+                if remainder != 0:
+                    num_dummies = self.num_devices - remainder
+                    repeated_rows = pd.DataFrame([last_row] * num_dummies)
+                    repeated_rows.reset_index(
+                        drop=True,
+                        inplace=True,
+                    )
+                    data = pd.concat(
+                        [
+                            data,
+                            repeated_rows,
+                        ],
+                        ignore_index=True,
+                    )
         else:
             data = pd.read_pickle(f"{self.data_path}/path_data/path_{self.split}.pkl")
         data = data.dropna()
