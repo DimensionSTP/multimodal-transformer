@@ -79,16 +79,17 @@ class MultiModalArchitecture(LightningModule):
             text=text,
             text_mask=text_mask,
         )
-        loss = F.cross_entropy(
-            output,
-            label,
-        )
         logit = output
         if logit.dim() == 1:
             logit = logit.unsqueeze(0)
+            label = label.unsqueeze(0)
         pred = torch.argmax(
             logit,
             dim=1,
+        )
+        loss = F.cross_entropy(
+            logit,
+            label,
         )
         return {
             "loss": loss,
