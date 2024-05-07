@@ -95,7 +95,10 @@ class KEMDy19Dataset(Dataset):
         }
 
     def get_dataset(self) -> Dict[str, List[Any]]:
-        data = pd.read_pickle(f"{self.data_path}/path_data/path_{self.split}.pkl")
+        if self.split == "predict":
+            data = pd.read_pickle(f"{self.data_path}/path_data/path_test.pkl")
+        else:
+            data = pd.read_pickle(f"{self.data_path}/path_data/path_{self.split}.pkl")
         data = data.dropna()
         audio_paths = data["total_path"].values
         audio_paths = [

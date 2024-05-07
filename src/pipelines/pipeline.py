@@ -202,7 +202,7 @@ def predict(
 
     setup = SetUp(config)
 
-    predict_loader = setup.get_test_loader()
+    predict_loader = setup.get_predict_loader()
     architecture = setup.get_architecture()
     callbacks = setup.get_callbacks()
     logger = setup.get_wandb_logger()
