@@ -53,20 +53,6 @@ class SetUp:
             pin_memory=True,
         )
 
-    def predict_collate_fn(
-        self,
-        batch: List[Dict[str, Any]],
-    ) -> List[Dict[str, Any]]:
-        num_devices = self.config.devices
-        if num_devices == 1:
-            return batch
-        remainder = len(batch) % num_devices
-        if remainder != 0:
-            num_dummies = num_devices - remainder
-            last_item = batch[-1]
-            batch += [last_item] * num_dummies
-        return batch
-
     def get_predict_loader(self) -> DataLoader:
         predict_dataset: Dataset = instantiate(
             self.config.dataset,
@@ -77,7 +63,6 @@ class SetUp:
             batch_size=self.config.batch_size,
             shuffle=False,
             pin_memory=True,
-            collate_fn=self.predict_collate_fn,
         )
 
     def get_architecture(self) -> LightningModule:
