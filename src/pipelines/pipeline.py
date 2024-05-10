@@ -304,7 +304,7 @@ def predict(
     sorted_logits = sorted_logits_with_indices[: len(pred_df), :-1].numpy()
     all_predictions = np.argmax(
         sorted_logits,
-        axis=1,
+        axis=-1,
     )
     if not os.path.exists(f"{config.connected_dir}/logits"):
         os.makedirs(

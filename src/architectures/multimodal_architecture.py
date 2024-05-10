@@ -85,7 +85,7 @@ class MultiModalArchitecture(LightningModule):
             label = label.unsqueeze(0)
         pred = torch.argmax(
             logit,
-            dim=1,
+            dim=-1,
         )
         loss = F.cross_entropy(
             logit,
