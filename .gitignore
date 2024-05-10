@@ -7,6 +7,7 @@
 *.pt
 *.pth
 *.npy
+*.txt
 *__pycache__
 tmp*
 data/
@@ -17,3 +18,5 @@ multirun/
 outputs/
 checkpoints/
 preds/
+!requirements.txt
+!packages.txt
