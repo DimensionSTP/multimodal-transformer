@@ -5,10 +5,12 @@ run_name: soft_voting
 work_dir: ${hydra:runtime.cwd}
 
 basic_path: /data/multimodal-transformer
+voted_name: soft_voting
 
+voted_logit: ${basic_path}/logits/${voted_name}.npy
 submission_file: ${basic_path}/data/test.csv
 target_column_name: emotion
-voting_file: ${basic_path}/submissions/soft_voting.csv
+voted_file: ${basic_path}/submissions/${voted_name}.csv
 
 votings:
   logit1: 0.5
