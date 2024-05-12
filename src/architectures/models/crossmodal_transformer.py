@@ -36,7 +36,14 @@ class TransformerBlock(nn.Module):
         key_padding_mask: Optional[torch.Tensor],
         attn_mask: bool,
     ) -> torch.Tensor:
-        query, key, value = [self.layer_norm(x) for x in (query, key, value)]
+        query, key, value = [
+            self.layer_norm(x)
+            for x in (
+                query,
+                key,
+                value,
+            )
+        ]
         mask = (
             self.get_future_mask(
                 query=query,
@@ -65,6 +72,7 @@ class TransformerBlock(nn.Module):
         future_mask = torch.ones(
             seq_len_query,
             seq_len_key,
+            device=query.device,
         )
         future_mask = torch.triu(
             future_mask,
