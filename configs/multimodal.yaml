@@ -65,14 +65,14 @@ hparams_save_path: ${connected_dir}/hparams/${model_name}/${dataset_name}/${num_
 tuned_hparams_path: ${hparams_save_path}/best_params.json
 
 project_name: ${model_name}-${dataset_name}-${mode}
-total_batch_size: bs${batch_size}x${devices}x${accumulate_grad_batches}
-save_detail: model_dims${model_dims}-num_heads${num_heads}-num_layers${num_layers}-precision${precision}-${total_batch_size}
+total_batch_size: bs=${batch_size}x${devices}x${accumulate_grad_batches}
+save_detail: model_dims=${model_dims}-num_heads=${num_heads}-num_layers=${num_layers}-precision=${precision}-${total_batch_size}
 resumed_step: 0
-ckpt_path: ${callbacks.model_checkpoint.dirpath}/epoch${epoch}.ckpt
+ckpt_path: ${callbacks.model_checkpoint.dirpath}/epoch=${epoch}.ckpt
 
 submission_file_name: test
-logit_name: ${save_detail}-epoch${epoch}
-submission_name: ${save_detail}-epoch${epoch}
+logit_name: ${save_detail}-epoch=${epoch}
+submission_name: ${save_detail}-epoch=${epoch}
 
 run_name: ${project_name}
 work_dir: ${hydra:runtime.cwd}
