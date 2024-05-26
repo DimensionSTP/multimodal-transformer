@@ -5,8 +5,8 @@ defaults:
   - hydra: hydra
 
 package_name: multimodal-transformer
-project_dir: /home/ddang/${package_name}
-connected_dir: /data/${package_name}
+project_dir: ${oc.env:PROJECT_DIR}/${package_name}
+connected_dir: ${oc.env:CONNECTED_DIR}/${package_name}
 
 seed: 2024
 

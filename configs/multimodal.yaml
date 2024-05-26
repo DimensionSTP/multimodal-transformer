@@ -9,8 +9,8 @@ defaults:
   - trainer: trainer
 
 package_name: multimodal-transformer
-project_dir: /home/ddang/${package_name}
-connected_dir: /data/${package_name}
+project_dir: ${oc.env:PROJECT_DIR}/${package_name}
+connected_dir: ${oc.env:CONNECTED_DIR}/${package_name}
 
 seed: 2024
 
@@ -38,21 +38,23 @@ out_dropout: .3
 attn_mask: False
 scale_embedding: True
 
-lr: 0.00001
-t_max: 50
-eta_min: 0.0000025
+lr: 0.0001
+period: 2
+eta_min: 0.00001
 
 monitor: val_MulticlassF1Score
 tracking_direction: max
-patience: 3
+patience: 2
 min_delta: 0
 
-devices: 4
+devices: ${oc.decode:${oc.env:DEVICES}}
 accelerator: gpu
 strategy: ddp
 log_every_n_steps: 10
 precision: 32
 accumulate_grad_batches: 1
+gradient_clip_val: 1
+gradient_clip_algorithm: norm
 epoch: 20
 
 model_name: MultiModalTransformer
