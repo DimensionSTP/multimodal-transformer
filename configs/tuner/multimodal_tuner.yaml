@@ -37,9 +37,9 @@ hparams:
     low: 0.000005
     high: 0.00005
     log: False
-  t_max:
-    low: 25
-    high: 100
+  period:
+    low: 1
+    high: 10
     log: False
   eta_min:
     low: 0.0000001
@@ -58,6 +58,8 @@ module_params:
   log_every_n_steps: ${log_every_n_steps}
   precision: ${precision}
   accumulate_grad_batches: ${accumulate_grad_batches}
+  gradient_clip_val: ${gradient_clip_val}
+  gradient_clip_algorithm: ${gradient_clip_algorithm}
   max_epochs: ${epoch}
   monitor: ${monitor}
   mode: ${tracking_direction}
