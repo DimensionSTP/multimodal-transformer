@@ -1,8 +1,14 @@
+import dotenv
+
+dotenv.load_dotenv(
+    override=True,
+)
+
 import os
 import warnings
 
 os.environ["HYDRA_FULL_ERROR"] = "1"
-os.environ["HF_HOME"] = "/data/huggingface"
+os.environ["HF_HOME"] = os.environ.get("HF_HOME")
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 warnings.filterwarnings("ignore")
 
