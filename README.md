@@ -20,6 +20,14 @@ conda activate myenv
 pip install -r requirements.txt
 ```
 
+### .env file setting
+```shell
+PROJECT_DIR={PROJECT_DIR}
+CONNECTED_DIR={CONNECTED_DIR}
+DEVICES={DEVICES}
+HF_HOME={HF_HOME}
+```
+
 ### Single Modality Training
 
 * only audio
@@ -58,6 +66,18 @@ python main.py mode=test is_tuned={tuned or untuned} num_trials={num_trials} epo
 * end-to-end
 ```shell
 python main.py mode=predict is_tuned={tuned or untuned} num_trials={num_trials} epoch={ckpt epoch}
+```
+
+### Examples of shell scipts
+
+* train
+```shell
+bash scripts/train.sh
+```
+
+* test
+```shell
+bash scripts/test.sh
 ```
 
 
