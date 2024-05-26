@@ -5,4 +5,6 @@ strategy: ${strategy}
 log_every_n_steps: ${log_every_n_steps}
 precision: ${precision}
 accumulate_grad_batches: ${accumulate_grad_batches}
+gradient_clip_val: ${gradient_clip_val}
+gradient_clip_algorithm: ${gradient_clip_algorithm}
 max_epochs: ${epoch}
