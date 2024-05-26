@@ -21,6 +21,6 @@ num_labels: ${num_labels}
 average: macro
 strategy: ${strategy}
 lr: ${lr}
-t_max: ${t_max}
+period: ${period}
 eta_min: ${eta_min}
 interval: step
