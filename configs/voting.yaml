@@ -4,13 +4,14 @@ defaults:
 run_name: soft_voting
 work_dir: ${hydra:runtime.cwd}
 
-basic_path: /data/multimodal-transformer
+package_name: multimodal-transformer
+connected_dir: ${oc.env:CONNECTED_DIR}/${package_name}
 voted_name: soft_voting
 
-voted_logit: ${basic_path}/logits/${voted_name}.npy
-submission_file: ${basic_path}/data/test.csv
+voted_logit: ${connected_dir}/logits/${voted_name}.npy
+submission_file: ${connected_dir}/data/test.csv
 target_column_name: emotion
-voted_file: ${basic_path}/submissions/${voted_name}.csv
+voted_file: ${connected_dir}/submissions/${voted_name}.csv
 
 votings:
   logit1: 0.5

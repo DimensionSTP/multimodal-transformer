@@ -1,3 +1,9 @@
+import dotenv
+
+dotenv.load_dotenv(
+    override=True,
+)
+
 import os
 import warnings
 
