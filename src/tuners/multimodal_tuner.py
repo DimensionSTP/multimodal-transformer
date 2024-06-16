@@ -21,25 +21,29 @@ class MultiModalTuner:
         self,
         hparams: Dict[str, Any],
         module_params: Dict[str, Any],
-        num_trials: int,
+        direction: str,
         seed: int,
+        num_trials: int,
         hparams_save_path: str,
+        monitor: str,
         train_loader: DataLoader,
         val_loader: DataLoader,
         logger: WandbLogger,
     ) -> None:
         self.hparams = hparams
         self.module_params = module_params
-        self.num_trials = num_trials
+        self.direction = direction
         self.seed = seed
+        self.num_trials = num_trials
         self.hparams_save_path = hparams_save_path
+        self.monitor = monitor
         self.train_loader = train_loader
         self.val_loader = val_loader
         self.logger = logger
 
     def __call__(self) -> None:
         study = optuna.create_study(
-            direction="maximize",
+            direction=self.direction,
             sampler=TPESampler(seed=self.seed),
             pruner=HyperbandPruner(),
         )
@@ -219,4 +223,4 @@ class MultiModalTuner:
             )
             raise e
 
-        return trainer.callback_metrics["val_MulticlassF1Score"].item()
+        return trainer.callback_metrics[self.monitor].item()
