@@ -12,6 +12,6 @@ do
         is_tuned=$is_tuned \
         strategy=$strategy \
         precision=$precision \
-        batch_size=$batch_size
+        batch_size=$batch_size \
         epoch=$epoch
 done
