@@ -68,7 +68,6 @@ class SetUp:
     def get_architecture(self) -> LightningModule:
         architecture: LightningModule = instantiate(
             self.config.architecture,
-            strategy=self.config.strategy,
         )
         return architecture
 
