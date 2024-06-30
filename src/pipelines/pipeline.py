@@ -95,10 +95,7 @@ def train(
         )
         raise e
 
-    if (
-        config.strategy == "deepspeed_stage_3"
-        or config.strategy == "deepspeed_stage_3_offload"
-    ):
+    if config.strategy.startswith("deepspeed"):
         for epoch in range(config.epoch):
             ckpt_path = (
                 f"{config.callbacks.model_checkpoint.dirpath}/epoch={epoch}.ckpt"
