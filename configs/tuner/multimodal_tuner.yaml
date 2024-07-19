@@ -37,6 +37,10 @@ hparams:
     low: 0.000005
     high: 0.00005
     log: False
+  weight_decay:
+    low: 0.001
+    high: 0.01
+    log: False
   period:
     low: 1
     high: 10
