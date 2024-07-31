@@ -40,8 +40,8 @@ scale_embedding: True
 
 lr: 0.0001
 weight_decay: 0.01
-period: 2
-eta_min: 0.00001
+half_period: 1
+eta_min_rate: 0.1
 
 monitor: val_MulticlassF1Score
 tracking_direction: max
