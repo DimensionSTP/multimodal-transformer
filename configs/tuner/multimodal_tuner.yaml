@@ -41,13 +41,13 @@ hparams:
     low: 0.001
     high: 0.01
     log: False
-  period:
+  half_period:
     low: 1
     high: 10
     log: False
-  eta_min:
-    low: 0.0000001
-    high: 0.0000005
+  eta_min_rate:
+    low: 0.05
+    high: 0.5
     log: False
 
 module_params:
