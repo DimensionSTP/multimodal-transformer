@@ -20,12 +20,18 @@ from omegaconf import DictConfig
 
 @hydra.main(
     config_path="../../configs/",
-    config_name="huggingface.yaml",
+    config_name="multimodal.yaml",
 )
 def prepare_upload(
     config: DictConfig,
 ) -> None:
-    save_dir = f"{config.connected_dir}/prepare_upload/{config.pretrained_model_name}/epoch={config.epoch}"
+    save_dir = f"{config.connected_dir}/prepare_upload/{config.model_detail}/epoch={config.epoch}"
+    if not os.path.exists(save_dir):
+        os.makedirs(
+            save_dir,
+            exist_ok=True,
+        )
+
     if config.strategy.startswith("deepspeed"):
         checkpoint = torch.load(f"{config.ckpt_path}/model.pt")
     else:
@@ -46,7 +52,6 @@ def prepare_upload(
                 )
             model_state_dict[k] = v
 
-    state_dict = model_state_dict
     if config.precision == 32 or config.precision == "32":
         safetensors_dtype = torch.float32
     elif config.precision == 16 or config.precision == "16":
@@ -55,6 +60,8 @@ def prepare_upload(
         safetensors_dtype = torch.bfloat16
     else:
         raise ValueError(f"Invalid precision type: {config.precision}")
+
+    state_dict = model_state_dict
     keys = list(state_dict.keys())
     num_splits = config.num_safetensors
     split_size = len(keys) // num_splits
@@ -68,11 +75,6 @@ def prepare_upload(
         "weight_map": {},
     }
 
-    if not os.path.exists(save_dir):
-        os.makedirs(
-            save_dir,
-            exist_ok=True,
-        )
     for i in tqdm(range(num_splits)):
         safe_tensors_name = f"model-{i+1:05d}-of-{num_splits:05d}.safetensors"
         part_state_dict = {
