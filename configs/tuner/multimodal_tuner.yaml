@@ -34,20 +34,20 @@ hparams:
     - True
     - False
   lr:
-    low: 0.000005
-    high: 0.00005
+    low: 0.0005
+    high: 0.005
     log: False
   weight_decay:
     low: 0.001
     high: 0.01
     log: False
-  half_period:
-    low: 1
-    high: 10
+  warmup_rate:
+    low: 0.01
+    high: 0.1
     log: False
   eta_min_rate:
-    low: 0.05
-    high: 0.5
+    low: 0.005
+    high: 0.05
     log: False
 
 module_params:
