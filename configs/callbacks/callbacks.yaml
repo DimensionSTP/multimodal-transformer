@@ -2,7 +2,7 @@ model_checkpoint:
   _target_: lightning.pytorch.callbacks.ModelCheckpoint
   monitor: ${monitor}
   mode: ${tracking_direction}
-  save_top_k: ${patience}
+  save_top_k: ${epoch}
   save_last: True
   verbose: True
   dirpath: ${connected_dir}/checkpoints/${model_name}/${dataset_name}/${is_tuned}/${strategy}/${save_detail}
