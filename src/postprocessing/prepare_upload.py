@@ -76,13 +76,14 @@ def prepare_upload(
     }
 
     for i in tqdm(range(num_splits)):
+        start_idx = i * split_size
+        end_idx = (i + 1) * split_size if i < num_splits - 1 else len(keys)
         safe_tensors_name = f"model-{i+1:05d}-of-{num_splits:05d}.safetensors"
         part_state_dict = {
-            k: state_dict[k].to(safetensors_dtype)
-            for k in keys[i * split_size : (i + 1) * split_size]
+            k: state_dict[k].to(safetensors_dtype) for k in keys[start_idx:end_idx]
         }
         part_state_dict_mapping = {
-            k: safe_tensors_name for k in keys[i * split_size : (i + 1) * split_size]
+            k: safe_tensors_name for k in keys[start_idx:end_idx]
         }
         index_dict["weight_map"].update(part_state_dict_mapping)
         save_file(
