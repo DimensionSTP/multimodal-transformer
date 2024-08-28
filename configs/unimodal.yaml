@@ -30,7 +30,7 @@ metric:
   first_metric: glue
   second_metric: mnli
 
-lr: 0.00002
+lr: 2e-5
 
 epoch: 5
 
