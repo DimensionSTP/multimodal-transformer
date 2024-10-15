@@ -13,6 +13,7 @@
 *.ipynb
 *.tar
 *.tar.gz
+*.log
 *.bin
 *__pycache__
 logs/runs/
@@ -23,7 +24,9 @@ outputs/
 checkpoints/
 preds/
 KEMDy19/
+prepare_upload/
 baseline/
+/wandb
 tmp*
 !requirements.txt
 !packages.txt
