@@ -2,6 +2,8 @@ from typing import Optional
 import math
 import copy
 
+from einops import rearrange
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -184,6 +186,7 @@ class CrossModalTransformer(nn.Module):
         scale_embedding: bool,
     ) -> None:
         super().__init__()
+        self.num_heads = num_heads
         self.attn_mask = attn_mask
         self.emb_scale = math.sqrt(model_dims) if scale_embedding else 1.0
         self.pos_emb = RotaryPositionalEmbeddings(
@@ -211,15 +214,31 @@ class CrossModalTransformer(nn.Module):
         key: torch.Tensor,
         key_padding_mask: Optional[torch.Tensor],
     ) -> torch.Tensor:
-        # query settings
-        pos_query = self.pos_emb(query[:, :, 0])
-        query = self.emb_scale * query + pos_query
+        query = rearrange(
+            query,
+            "batch_size seq_len (num_heads head_dims) -> batch_size seq_len num_heads head_dims",
+            num_heads=self.num_heads,
+        )
+        query = self.pos_emb(query)
+        query = rearrange(
+            query,
+            "batch_size seq_len num_heads head_dims -> batch_size seq_len (num_heads head_dims)",
+        )
+        query = self.emb_scale * query
         query = self.dropout(query)
 
-        # key settings
         if key is not None:
-            pos_key = self.pos_emb(key[:, :, 0])
-            key = self.emb_scale * key + pos_key
+            key = rearrange(
+                key,
+                "batch_size seq_len (num_heads head_dims) -> batch_size seq_len num_heads head_dims",
+                num_heads=self.num_heads,
+            )
+            key = self.pos_emb(key)
+            key = rearrange(
+                key,
+                "batch_size seq_len num_heads head_dims -> batch_size seq_len (num_heads head_dims)",
+            )
+            key = self.emb_scale * key
             key = self.dropout(key)
 
         for layer in self.layers:
