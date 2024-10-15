@@ -7,7 +7,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.modules.container import ModuleList
 
-from fairseq.modules import SinusoidalPositionalEmbedding
+from torchtune.modules import RotaryPositionalEmbeddings
 
 
 class TransformerBlock(nn.Module):
@@ -186,10 +186,9 @@ class CrossModalTransformer(nn.Module):
         super().__init__()
         self.attn_mask = attn_mask
         self.emb_scale = math.sqrt(model_dims) if scale_embedding else 1.0
-        self.pos_emb = SinusoidalPositionalEmbedding(
-            embedding_dim=model_dims,
-            padding_idx=0,
-            init_size=text_max_length,
+        self.pos_emb = RotaryPositionalEmbeddings(
+            dim=model_dims // num_heads,
+            max_seq_len=text_max_length,
         )
         self.dropout = nn.Dropout(emb_dropout)
 
