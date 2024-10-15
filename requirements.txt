@@ -15,6 +15,7 @@ pytorch-lightning==2.4.0
 safetensors==0.4.5
 tokenizers==0.20.1
 torch==2.4.1
+torchao==0.5.0
 torchaudio==2.4.1
 torchmetrics==1.4.3
 torchtune==0.3.1
