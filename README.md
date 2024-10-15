@@ -13,7 +13,7 @@ git clone https://github.com/DimensionSTP/multimodal-transformer.git
 cd multimodal-transformer
 
 # [OPTIONAL] create conda environment
-conda create -n myenv python=3.8
+conda create -n myenv python=3.10 -y
 conda activate myenv
 
 # install requirements
