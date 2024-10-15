@@ -62,7 +62,7 @@ model_name: MultiModalTransformer
 dataset_name: KEMDy19
 mode: train
 
-is_tuned: tuned
+is_tuned: untuned
 num_trials: 3
 hparams_save_path: ${connected_dir}/hparams/${model_name}/${dataset_name}/${num_trials}_trials
 tuned_hparams_path: ${hparams_save_path}/best_params.json
