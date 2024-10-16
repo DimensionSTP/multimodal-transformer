@@ -72,13 +72,16 @@ class SetUp:
         return architecture
 
     def get_callbacks(self) -> List[Any]:
-        model_checkpotint: ModelCheckpoint = instantiate(
+        model_checkpoint: ModelCheckpoint = instantiate(
             self.config.callbacks.model_checkpoint,
         )
         early_stopping: EarlyStopping = instantiate(
             self.config.callbacks.early_stopping,
         )
-        return [model_checkpotint, early_stopping]
+        return [
+            model_checkpoint,
+            early_stopping,
+        ]
 
     def get_wandb_logger(self) -> WandbLogger:
         wandb_logger: WandbLogger = instantiate(
