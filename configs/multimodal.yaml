@@ -41,7 +41,7 @@ scale_embedding: True
 lr: 1e-3
 weight_decay: 1e-2
 warmup_ratio: 5e-2
-eta_min_ratio: 1e-3
+eta_min_ratio: 1e-2
 
 monitor: val_MulticlassF1Score
 tracking_direction: max
