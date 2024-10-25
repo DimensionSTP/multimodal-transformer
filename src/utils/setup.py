@@ -1,4 +1,5 @@
-from typing import Dict, Any, List
+from typing import Any, List
+import os
 
 from omegaconf import DictConfig
 from hydra.utils import instantiate
@@ -16,6 +17,14 @@ class SetUp:
         config: DictConfig,
     ) -> None:
         self.config = config
+        self.num_cpus = os.cpu_count()
+        self.num_fit_workers = min(
+            self.num_cpus,
+            (config.devices * config.workers_ratio),
+        )
+        self.num_workers = (
+            self.num_cpus if config.use_all_workers else self.num_fit_workers
+        )
 
     def get_train_loader(self) -> DataLoader:
         train_dataset: Dataset = instantiate(
@@ -26,6 +35,7 @@ class SetUp:
             dataset=train_dataset,
             batch_size=self.config.batch_size,
             shuffle=True,
+            num_workers=self.num_workers,
             pin_memory=True,
         )
 
@@ -38,6 +48,7 @@ class SetUp:
             dataset=val_dataset,
             batch_size=self.config.batch_size,
             shuffle=False,
+            num_workers=self.num_workers,
             pin_memory=True,
         )
 
@@ -50,6 +61,7 @@ class SetUp:
             dataset=test_dataset,
             batch_size=self.config.batch_size,
             shuffle=False,
+            num_workers=self.num_workers,
             pin_memory=True,
         )
 
@@ -62,6 +74,7 @@ class SetUp:
             dataset=predict_dataset,
             batch_size=self.config.batch_size,
             shuffle=False,
+            num_workers=self.num_workers,
             pin_memory=True,
         )
 
