@@ -82,7 +82,6 @@ submission_name: ${save_detail}-epoch=${epoch}
 user_name: ${oc.env:USER_NAME}
 model_detail: multimodal-transformer
 upload_tag: multimodal-emotions
-num_safetensors: 2
 
 run_name: ${project_name}
 work_dir: ${hydra:runtime.cwd}
