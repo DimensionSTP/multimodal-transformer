@@ -52,14 +52,13 @@ class MultiModalTuner:
         trial = study.best_trial
         best_score = trial.value
         best_params = trial.params
-        print(f"Best score : {best_score}")
-        print(f"Parameters : {best_params}")
+        print(f"Best score: {best_score}")
+        print(f"Parameters: {best_params}")
 
-        if not os.path.exists(self.hparams_save_path):
-            os.makedirs(
-                self.hparams_save_path,
-                exist_ok=True,
-            )
+        os.makedirs(
+            self.hparams_save_path,
+            exist_ok=True,
+        )
 
         with open(f"{self.hparams_save_path}/best_params.json", "w") as json_file:
             json.dump(

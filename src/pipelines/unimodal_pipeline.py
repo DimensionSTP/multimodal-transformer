@@ -50,11 +50,10 @@ def pipeline(
     trainer.evaluate()
     pred = trainer.predict(test_dataset)
     predictions = pred.predictions
-    if not os.path.exists(config.save_predictions):
-        os.makedirs(
-            config.save_predictions,
-            exist_ok=True,
-        )
+    os.makedirs(
+        config.save_predictions,
+        exist_ok=True,
+    )
     np.save(
         f"{config.save_predictions}/{config.mode}.npy",
         predictions,
