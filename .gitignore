@@ -15,6 +15,7 @@
 *.tar.gz
 *.log
 *.bin
+*.safetensors
 *__pycache__
 logs/runs/
 logs/wandb/
